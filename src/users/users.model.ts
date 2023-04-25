@@ -1,15 +1,15 @@
 import {Column, DataType, Model, Table} from "sequelize-typescript";
 import {ApiProperty} from "@nestjs/swagger";
 
-interface UserCreationsAttributes {
-    name: string;
-    password: string;
-    phone: string;
-    type: string;
-}
+// interface UserCreationsAttributes {
+//     name: string;
+//     password: string;
+//     phone: string;
+//     type: string;
+// }
 
 @Table
-export class User extends Model<User, UserCreationsAttributes> {
+export class User extends Model {
 
     @ApiProperty({example: '1', description: 'User unique identificator'})
     @Column(
