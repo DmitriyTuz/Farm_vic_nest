@@ -10,12 +10,12 @@ export class UsersController {
 
     constructor(private userService: UsersService) {}
 
-    @ApiOperation({summary: 'User creation'})
-    @ApiResponse({status: 200, type: User})
-    @Post()
-    create(@Body() userDto: CreateUserDto) {
-        return this.userService.createUser(userDto);
-    }
+    // @ApiOperation({summary: 'User creation'})
+    // @ApiResponse({status: 200, type: User})
+    // @Post()
+    // create(@Body() userDto: CreateUserDto) {
+    //     return this.userService.createUser(userDto);
+    // }
 
     @ApiOperation({summary: 'Get all users'})
     @ApiResponse({status: 200, type: [User]})
