@@ -10,4 +10,6 @@ export class CreateUserDto {
     readonly phone: string;
     @ApiProperty({example: 'WORKER', description: "Role"})
     readonly type: string;
+
+    readonly companyId: number;
 }

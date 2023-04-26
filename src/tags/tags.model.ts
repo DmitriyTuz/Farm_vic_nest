@@ -31,7 +31,7 @@ export class Tag extends Model {
 
     @ForeignKey(() => Company)
     @Column({
-        allowNull: false,
+        // allowNull: false,
     })
     companyId: number;
 

@@ -10,12 +10,12 @@ export class UsersController {
 
     constructor(private userService: UsersService) {}
 
-    // @ApiOperation({summary: 'User creation'})
-    // @ApiResponse({status: 200, type: User})
-    // @Post()
-    // create(@Body() userDto: CreateUserDto) {
-    //     return this.userService.createUser(userDto);
-    // }
+    @ApiOperation({summary: 'User creation'})
+    @ApiResponse({status: 200, type: User})
+    @Post()
+    create(@Body() userDto: CreateUserDto) {
+        return this.userService.createUser(userDto);
+    }
 
     @ApiOperation({summary: 'Get all users'})
     @ApiResponse({status: 200, type: [User]})
@@ -26,7 +26,8 @@ export class UsersController {
 
     @Get('/findQuery')
     getOneUser(
-        @Query('findQuery') findQuery: string,
+        @Query() findQuery: any,
+        // @Query('findQuery') findQuery: object,
     ) {
         return this.userService.getOneUser(findQuery);
     }
