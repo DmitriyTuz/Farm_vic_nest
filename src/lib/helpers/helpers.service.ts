@@ -1,9 +1,5 @@
-import {HttpException, HttpStatus, Injectable} from '@nestjs/common';
+import {Injectable} from '@nestjs/common';
 import {Model, Sequelize} from "sequelize-typescript";
-// import {Model, Sequelize} from "sequelize";
-import {InjectModel} from "@nestjs/sequelize";
-
-// import { Model, ModelAttributes } from 'sequelize';
 
 @Injectable()
 export class HelpersService {

@@ -5,6 +5,9 @@ import {ConfigModule} from "@nestjs/config";
 import {User} from "./users/users.model";
 
 import { HelpersModule } from './lib/helpers/helpers.module';
+import {Tag} from "./tags/tags.model";
+import {Company} from "./companies/companies.model";
+import {UserTags} from "./tags/user-tags.model";
 
 
 @Module({
@@ -21,7 +24,7 @@ import { HelpersModule } from './lib/helpers/helpers.module';
             username: process.env.POSTGRES_USER,
             password: process.env.POSTGRES_PASSWORD,
             database: process.env.POSTGRES_DB,
-            models: [User],
+            models: [User, Tag, Company, UserTags],
             // autoLoadModels: true
         }),
         UsersModule,
