@@ -22,4 +22,18 @@ export class UsersService {
         const usersAttributes = this.helperService.getModelFields(User, [], true, true, 'User')
         return usersAttributes;
     }
+
+    async getOneUser(findQuery): Promise<User> {
+        return User.findOne({
+            // attributes: this.helperService.getModelFields(User, [], true, true, 'User'),
+            // where: findQuery, include: [{
+            //     attributes: ['id', 'name'],
+            //     model: Tag,
+            //     as: 'tags',
+            //     through: {attributes: []}
+            // }, {
+            //     model: Company, as: 'company'
+            // }]
+        });
+    }
 }
