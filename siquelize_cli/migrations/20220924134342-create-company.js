@@ -14,7 +14,7 @@ module.exports = {
       },
       isTrial: {
         type: Sequelize.BOOLEAN,
-        defaultValue: false
+         defaultValue: false
       },
       hasTrial: {
         type: Sequelize.BOOLEAN,

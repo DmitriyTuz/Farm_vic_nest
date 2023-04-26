@@ -1,4 +1,4 @@
-import {BelongsTo, BelongsToMany, Column, DataType, ForeignKey, Model, Table} from "sequelize-typescript";
+import {BelongsTo, BelongsToMany, Column, DataType, Model, Table} from "sequelize-typescript";
 import {ApiProperty} from "@nestjs/swagger";
 import {Company} from "../companies/companies.model";
 import {Tag} from "../tags/tags.model";
@@ -45,13 +45,15 @@ export class User extends Model {
     @Column
     lastActive: Date;
 
-    @ForeignKey(() => Company)
-    @Column({
-        allowNull: false,
-    })
-    companyId: number;
+    // @ForeignKey(() => Company)
+    // @Column({
+    //     // allowNull: false,
+    // })
+    // companyId: number;
 
-    @BelongsTo(() => Company)
+    @BelongsTo(() => Company, { foreignKey: 'companyId' })
+
+    // @BelongsTo(() => Company)
     company: Company;
 
     @BelongsToMany(() => Tag, () => UserTags)

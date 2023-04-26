@@ -24,9 +24,9 @@ export class Company extends Model {
     )
     id: number;
 
-    @ApiProperty({example: '1', description: "owner identificator"})
-    @Column
-    ownerId: number;
+    // @ApiProperty({example: '1', description: "owner identificator"})
+    // @Column
+    // ownerId: number;
 
     @ApiProperty({example: 'some.jgp', description: "owner logo"})
     @Column (
@@ -56,7 +56,7 @@ export class Company extends Model {
     @Column
     trialAt: Date;
 
-    @HasMany(() => User)
+    @HasMany(() => User, 'companyId')
     users: User[];
 
     @HasMany(() => Tag)
