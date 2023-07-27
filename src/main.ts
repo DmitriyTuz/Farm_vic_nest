@@ -2,9 +2,17 @@ import {NestFactory} from "@nestjs/core";
 import {AppModule} from "./app.module";
 import {DocumentBuilder, SwaggerModule} from "@nestjs/swagger";
 
+import { JwtStrategy } from './auth/strategies/jwt.strategy';
+import * as passport from 'passport';
+
 async function start() {
   const PORT = process.env.PORT || 5000;
   const app = await NestFactory.create(AppModule);
+
+  app.use(passport.initialize());
+
+  const jwtStrategy = app.get(JwtStrategy);
+  passport.use(jwtStrategy);
 
   const config = new DocumentBuilder()
       .setTitle('Farm_vic_nest')

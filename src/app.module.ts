@@ -1,13 +1,18 @@
-import {Module} from "@nestjs/common";
-import {SequelizeModule} from "@nestjs/sequelize";
+import { Module } from "@nestjs/common";
+import { SequelizeModule } from "@nestjs/sequelize";
 import { UsersModule } from './users/users.module';
-import {ConfigModule} from "@nestjs/config";
-import {User} from "./users/users.model";
+import { ConfigModule } from "@nestjs/config";
+import { User } from "./users/users.model";
 
+import { Tag } from "./tags/tags.model";
+import { Company } from "./companies/companies.model";
+import { UserTags } from "./tags/user-tags.model";
+import { AuthModule } from './auth/auth.module';
 import { HelpersModule } from './lib/helpers/helpers.module';
-import {Tag} from "./tags/tags.model";
-import {Company} from "./companies/companies.model";
-import {UserTags} from "./tags/user-tags.model";
+import { CheckerModule } from './lib/checker/checker.module';
+import { PasswordModule } from './lib/password/password.module';
+// import { AccountController } from './account/account.controller';
+// import { AccountModule } from './account/account.module';
 
 
 @Module({
@@ -28,7 +33,11 @@ import {UserTags} from "./tags/user-tags.model";
             // autoLoadModels: true
         }),
         UsersModule,
+        AuthModule,
         HelpersModule,
+        CheckerModule,
+        PasswordModule,
+        // AccountModule,
     ]
 
 })

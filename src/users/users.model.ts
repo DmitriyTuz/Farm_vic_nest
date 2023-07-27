@@ -52,8 +52,6 @@ export class User extends Model {
     // companyId: number;
 
     @BelongsTo(() => Company, { foreignKey: 'companyId' })
-
-    // @BelongsTo(() => Company)
     company: Company;
 
     @BelongsToMany(() => Tag, () => UserTags)
