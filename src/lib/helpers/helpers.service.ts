@@ -1,5 +1,9 @@
 import {Injectable} from '@nestjs/common';
 import {Model, Sequelize} from "sequelize-typescript";
+// const jwt = require('jsonwebtoken');
+import jwt from "jsonwebtoken";
+// const {JWT_SECRET, JWT_EXPIRED_TIME} = require('../../../credentials').config
+import Credentials from "../../../credentials";
 
 @Injectable()
 export class HelpersService {
@@ -40,6 +44,15 @@ export class HelpersService {
         } catch (err) {
             throw (err);
         }
+    }
+
+    sendResponse(user, responseData, res) {
+        if (user?.id) {
+            const token = jwt.sign({id: user.id}, Credentials.config.JWT_SECRET);
+            res.cookie('AuthorizationToken', token, { maxAge: Credentials.config.JWT_EXPIRED_TIME, httpOnly: true });
+        }
+
+        res.status(200).send(responseData);
     }
 
 }

@@ -1,8 +1,9 @@
-import {Body, Controller, Get, Post, Query} from '@nestjs/common';
+import {Body, Controller, Get, Post, Query, UseGuards, Request} from '@nestjs/common';
 import {CreateUserDto} from "./dto/create-user.dto";
 import {UsersService} from "./users.service";
 import {ApiOperation, ApiResponse, ApiTags} from "@nestjs/swagger";
 import {User} from "./users.model";
+import {JwtAuthGuard} from "../auth/jwt-auth.guard";
 
 @ApiTags('Users')
 @Controller('users')
@@ -20,8 +21,15 @@ export class UsersController {
     @ApiOperation({summary: 'Get all users'})
     @ApiResponse({status: 200, type: [User]})
     @Get()
-    getAll() {
+    getAllUsers() {
         return this.userService.getAllUsers();
+    }
+
+    @Get('/get-all')
+    @UseGuards(JwtAuthGuard)
+    getAll(@Request() req) {
+        return console.log('req.user = ', req.user)
+        // return this.userService.getAllUsers({search, type, companyId});
     }
 
     @Get('/findQuery')

@@ -3,9 +3,9 @@ import {User} from "./users.model";
 import {InjectModel} from "@nestjs/sequelize";
 import {CreateUserDto} from "./dto/create-user.dto";
 import {HelpersService} from "../lib/helpers/helpers.service";
-import {Model} from "sequelize-typescript";
 import {Tag} from "../tags/tags.model";
 import {Company} from "../companies/companies.model";
+import _ from "underscore";
 
 
 @Injectable()
@@ -37,5 +37,11 @@ export class UsersService {
                 model: Company, as: 'company'
             }]
         });
+    }
+
+    getUserData(user) {
+        const data = _.pick(user, ['id', 'name', 'phone', 'type', 'tags', 'tasks', 'hasOnboard', 'companyId', 'company']);
+        data.tags = data.tags.map(tag => tag.name);
+        return data;
     }
 }

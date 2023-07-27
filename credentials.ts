@@ -1,0 +1,66 @@
+if (process.env.NODE_ENV !== 'production') {
+    require('dotenv').config();
+}
+
+const {
+    NODE_ENV,
+    PORT,
+    ROOT_URL,
+    USER_ADMIN_ID,
+    REDIRECT_URL,
+    FACEBOOK_CLIENT_ID,
+    FACEBOOK_CLIENT_SECRET,
+    LINKEDIN_CLIENT_ID,
+    LINKEDIN_SECRET,
+    LINKEDIN_REDIRECT_URL,
+    GOOGLE_CLIENT_ID,
+    GOOGLE_CLIENT_SECRET,
+    DB_USER, DB_PASS, DB_NAME, DB_HOST, DB_PORT,
+    JWT_SECRET,
+    JWT_EXPIRED_TIME,
+    AWS_ACCESS_KEY_ID,
+    AWS_SECRET_ACCESS_KEY,
+    AWS_BUCKET_NAME,
+    DATABASE_HOST_DIALECT_OPTIONS_SSL,
+    TWILIO_ACCOUNT_SID,
+    TWILIO_AUTH_TOKEN,
+    TWILIO_NUMBER,
+    STRIPE_ACCOUNT_ID,
+    STRIPE_PUBLISH_KEY,
+    STRIPE_SECRET_KEY
+} = process.env;
+
+const Credentials = {
+    config: {
+        NODE_ENV,
+        PORT,
+        ROOT_URL,
+        USER_ADMIN_ID,
+        REDIRECT_URL,
+        FACEBOOK_CLIENT_ID,
+        FACEBOOK_CLIENT_SECRET,
+        LINKEDIN_CLIENT_ID,
+        LINKEDIN_SECRET,
+        LINKEDIN_REDIRECT_URL,
+        GOOGLE_CLIENT_ID,
+        GOOGLE_CLIENT_SECRET,
+        DATABASE_HOST_DIALECT_OPTIONS_SSL,
+        DB_USER, DB_PASS, DB_NAME, DB_HOST, DB_PORT,
+        JWT_SECRET,
+        JWT_EXPIRED_TIME,
+        AWS_ACCESS_KEY_ID,
+        AWS_SECRET_ACCESS_KEY,
+        AWS_BUCKET_NAME,
+        TWILIO_ACCOUNT_SID,
+        TWILIO_AUTH_TOKEN,
+        TWILIO_NUMBER,
+        STRIPE_ACCOUNT_ID,
+        STRIPE_PUBLISH_KEY,
+        STRIPE_SECRET_KEY
+    },
+
+    adminId: USER_ADMIN_ID
+};
+
+export default Credentials;
+
