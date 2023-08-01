@@ -11,8 +11,9 @@ import { AuthModule } from './auth/auth.module';
 import { HelpersModule } from './lib/helpers/helpers.module';
 import { CheckerModule } from './lib/checker/checker.module';
 import { PasswordModule } from './lib/password/password.module';
-// import { AccountController } from './account/account.controller';
-// import { AccountModule } from './account/account.module';
+import { AccountModule } from './account/account.module';
+import { PaymentModule } from './payment/payment.module';
+import {Payment} from "./payment/payment.model";
 
 
 @Module({
@@ -29,7 +30,7 @@ import { PasswordModule } from './lib/password/password.module';
             username: process.env.POSTGRES_USER,
             password: process.env.POSTGRES_PASSWORD,
             database: process.env.POSTGRES_DB,
-            models: [User, Tag, Company, UserTags],
+            models: [User, Tag, Company, UserTags, Payment],
             // autoLoadModels: true
         }),
         UsersModule,
@@ -37,7 +38,8 @@ import { PasswordModule } from './lib/password/password.module';
         HelpersModule,
         CheckerModule,
         PasswordModule,
-        // AccountModule,
+        AccountModule,
+        PaymentModule,
     ]
 
 })

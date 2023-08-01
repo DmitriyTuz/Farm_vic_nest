@@ -1,4 +1,4 @@
-import {Body, Controller, Get, Post, Query, UseGuards, Request} from '@nestjs/common';
+import {Body, Controller, Get, Post, Query, UseGuards, Request, Param} from '@nestjs/common';
 import {CreateUserDto} from "./dto/create-user.dto";
 import {UsersService} from "./users.service";
 import {ApiOperation, ApiResponse, ApiTags} from "@nestjs/swagger";
@@ -38,5 +38,12 @@ export class UsersController {
         // @Query('findQuery') findQuery: object,
     ) {
         return this.userService.getOneUser(findQuery);
+    }
+
+    @Get(':id')
+    @ApiOperation({ summary: "Getting user by id" })
+    @ApiResponse({ status: 200, type: User })
+    getUserById(@Param('id') id: number): Promise<User> {
+        return this.userService.getUserById(id);
     }
 }
