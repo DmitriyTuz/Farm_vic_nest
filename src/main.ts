@@ -4,10 +4,19 @@ import {DocumentBuilder, SwaggerModule} from "@nestjs/swagger";
 
 import { JwtStrategy } from './auth/strategies/jwt.strategy';
 import * as passport from 'passport';
+import * as cookieParser from 'cookie-parser';
 
 async function start() {
+
   const PORT = process.env.PORT || 5000;
   const app = await NestFactory.create(AppModule);
+
+  app.use(cookieParser());
+
+  app.enableCors({
+    origin: 'http://localhost:3000',
+    credentials: true,
+  });
 
   app.use(passport.initialize());
 

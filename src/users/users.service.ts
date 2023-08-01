@@ -44,4 +44,16 @@ export class UsersService {
         data.tags = data.tags.map(tag => tag.name);
         return data;
     }
+
+    async getUserByEmail(email: string) {
+        const user = await this.userRepository.findOne({
+            where: { email },
+            include: { all: true },
+        });
+        return user;
+    }
+
+    async getUserById(id) {
+        return await this.userRepository.findOne({where: { id }});
+    }
 }

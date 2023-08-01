@@ -1,10 +1,11 @@
-import {BelongsTo, BelongsToMany, Column, DataType, Model, Table} from "sequelize-typescript";
+import {BelongsTo, BelongsToMany, Column, DataType, HasMany, Model, Table} from "sequelize-typescript";
 import {ApiProperty} from "@nestjs/swagger";
 import {Company} from "../companies/companies.model";
 import {Tag} from "../tags/tags.model";
 import {UserTags} from "../tags/user-tags.model";
+import {Payment} from "../payment/payment.model";
 
-// interface UserCreationsAttributes {
+// interface UserCreationAttrs {
 //     name: string;
 //     password: string;
 //     phone: string;
@@ -12,7 +13,7 @@ import {UserTags} from "../tags/user-tags.model";
 // }
 
 @Table
-export class User extends Model {
+export class User extends Model/*<User, UserCreationAttrs>*/ {
 
     @ApiProperty({example: '1', description: 'User unique identificator'})
     @Column(
@@ -42,7 +43,7 @@ export class User extends Model {
     @Column
     type: string;
 
-    @Column
+    @Column({ type: DataType.DATE })
     lastActive: Date;
 
     // @ForeignKey(() => Company)
@@ -56,5 +57,8 @@ export class User extends Model {
 
     @BelongsToMany(() => Tag, () => UserTags)
     tags: Tag[];
+
+    @HasMany(() => Payment)
+    payments: Payment[];
 
 }

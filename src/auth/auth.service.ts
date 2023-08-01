@@ -16,9 +16,9 @@ export class AuthService {
                 private userService: UsersService,
                 ) {}
 
-    async login(reqBody) {
+    async login(reqBody, req, res) {
         try {
-            reqBody.ip = reqBody.headers['x-forwarded-for'] || reqBody.connection.remoteAddress;
+            reqBody.ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 
             const user = await this.webSiteAuthorization(reqBody);
 
@@ -26,7 +26,7 @@ export class AuthService {
                 success: true
             }
 
-            return this.helperService.sendResponse({id: user.id}, response, Response);
+            return this.helperService.sendResponse({id: user.id}, response, res);
         } catch (err) {
             console.log(err)
         }
@@ -61,4 +61,6 @@ export class AuthService {
             throw (err);
         }
     }
+
+
 }

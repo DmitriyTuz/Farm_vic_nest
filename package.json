@@ -30,6 +30,7 @@
     "@nestjs/sequelize": "^9.0.2",
     "@nestjs/swagger": "^6.3.0",
     "bcrypt": "^5.1.0",
+    "cookie-parser": "^1.4.6",
     "cross-env": "^7.0.3",
     "migration": "^0.3.0",
     "passport": "^0.6.0",
