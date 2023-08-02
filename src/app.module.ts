@@ -3,7 +3,6 @@ import { SequelizeModule } from "@nestjs/sequelize";
 import { UsersModule } from './users/users.module';
 import { ConfigModule } from "@nestjs/config";
 import { User } from "./users/users.model";
-
 import { Tag } from "./tags/tags.model";
 import { Company } from "./companies/companies.model";
 import { UserTags } from "./tags/user-tags.model";
@@ -13,7 +12,8 @@ import { CheckerModule } from './lib/checker/checker.module';
 import { PasswordModule } from './lib/password/password.module';
 import { AccountModule } from './account/account.module';
 import { PaymentModule } from './payment/payment.module';
-import {Payment} from "./payment/payment.model";
+import { Payment } from "./payment/payment.model";
+import { TagsModule } from './tags/tags.module';
 
 
 @Module({
@@ -40,6 +40,7 @@ import {Payment} from "./payment/payment.model";
         PasswordModule,
         AccountModule,
         PaymentModule,
+        TagsModule,
     ]
 
 })

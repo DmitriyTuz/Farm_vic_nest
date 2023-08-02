@@ -33,7 +33,7 @@ import { Request } from 'express'; // Импортируем Request
 export class JwtStrategy extends PassportStrategy(Strategy) {
     constructor(private userService: UsersService) {
         super({
-            jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(), // Извлекаем токен из заголовка Authorization (Bearer токен)
+            jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
             secretOrKey: process.env.JWT_SECRET,
         });
     }
@@ -42,7 +42,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         return this.userService.getUserById(payload.id);
     }
 
-    // Добавим метод для извлечения токена из куки
     private getTokenFromCookie(req: Request): string | null {
         if (req?.cookies) {
             return req.cookies['AuthorizationToken'] || null;
@@ -50,7 +49,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         return null;
     }
 
-    // Переопределяем функцию из passport-jwt для получения токена из куки
     authenticate(req: Request, options?: any): any {
         const token = this.getTokenFromCookie(req);
         if (token) {
