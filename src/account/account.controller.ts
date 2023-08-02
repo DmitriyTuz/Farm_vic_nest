@@ -2,12 +2,12 @@ import {Controller, Get, UseGuards, Request} from '@nestjs/common';
 import {AccountService} from "./account.service";
 import {JwtAuthGuard} from "../auth/jwt-auth.guard";
 
-@Controller('account')
+@Controller()
 export class AccountController {
 
     constructor(private accountService: AccountService) {}
 
-    @Get('/get-one')
+    @Get('/api/account')
     @UseGuards(JwtAuthGuard)
     async getOne(@Request() req) {
         return await this.accountService.getOne(req.user.id);

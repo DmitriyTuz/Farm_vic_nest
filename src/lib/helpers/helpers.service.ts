@@ -1,8 +1,6 @@
 import {Injectable} from '@nestjs/common';
 import {Model, Sequelize} from "sequelize-typescript";
 const jwt = require('jsonwebtoken');
-// import jwt from "jsonwebtoken";
-// const {JWT_SECRET, JWT_EXPIRED_TIME} = require('../../../credentials').config
 import Credentials from "../../../credentials";
 
 @Injectable()
