@@ -14,6 +14,8 @@ import { AccountModule } from './account/account.module';
 import { PaymentModule } from './payment/payment.module';
 import { Payment } from "./payment/payment.model";
 import { TagsModule } from './tags/tags.module';
+import { StripeModule } from './stripe/stripe.module';
+import { CompaniesModule } from './companies/companies.module';
 
 
 @Module({
@@ -41,6 +43,8 @@ import { TagsModule } from './tags/tags.module';
         AccountModule,
         PaymentModule,
         TagsModule,
+        StripeModule,
+        CompaniesModule,
     ]
 
 })
