@@ -1,9 +1,11 @@
-import {Body, Controller, Get, Post, Query, UseGuards, Request, Param} from '@nestjs/common';
+import {Body, Controller, Get, Post, Query, UseGuards, Request, Param, Res} from '@nestjs/common';
 import {CreateUserDto} from "./dto/create-user.dto";
 import {UsersService} from "./users.service";
 import {ApiOperation, ApiResponse, ApiTags} from "@nestjs/swagger";
 import {User} from "./users.model";
 import {JwtAuthGuard} from "../auth/jwt-auth.guard";
+import {PlanMiddleware} from "../middlewares/plan-middleware/plan.middleware";
+import {GetWorkersOptions} from "../interfaces/worker-options";
 
 @ApiTags('Users')
 @Controller('users')
@@ -46,4 +48,5 @@ export class UsersController {
     getUserById(@Param('id') id: number): Promise<User> {
         return this.userService.getUserById(id);
     }
+
 }

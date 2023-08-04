@@ -3,4 +3,5 @@ export interface TagOptions {
     action?: string;
     search?: string;
     companyId?: number;
+    ids?: number[];
 }
