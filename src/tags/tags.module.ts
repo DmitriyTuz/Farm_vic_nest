@@ -7,14 +7,19 @@ import {User} from "../users/users.model";
 import {UserTags} from "./user-tags.model";
 import {AuthModule} from "../auth/auth.module";
 import {UsersModule} from "../users/users.module";
+import {Company} from "../companies/companies.model";
+import {CompaniesModule} from "../companies/companies.module";
+import {StripeModule} from "../stripe/stripe.module";
 
 @Module({
     controllers: [TagsController],
     providers: [TagsService],
     imports: [
-        SequelizeModule.forFeature([Tag, User, UserTags]),
+        SequelizeModule.forFeature([Tag, User, UserTags, Company]),
         AuthModule,
-        UsersModule
+        UsersModule,
+        CompaniesModule,
+        StripeModule
     ],
     exports: [TagsService]
 })
