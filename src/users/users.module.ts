@@ -9,6 +9,7 @@ import {Company} from "../companies/companies.model";
 import {UserTags} from "../tags/user-tags.model";
 import {AuthModule} from "../auth/auth.module";
 import {Payment} from "../payment/payment.model";
+import {StripeModule} from "../stripe/stripe.module";
 
 @Module({
   controllers: [UsersController],
@@ -16,7 +17,8 @@ import {Payment} from "../payment/payment.model";
   imports: [
       SequelizeModule.forFeature([User, Tag, Company, UserTags, Payment]),
       HelpersModule,
-      forwardRef(() => AuthModule)
+      forwardRef(() => AuthModule),
+      StripeModule
   ],
   exports: [UsersService]
 })

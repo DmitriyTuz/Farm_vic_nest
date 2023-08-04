@@ -6,7 +6,8 @@ import {HelpersService} from "../lib/helpers/helpers.service";
 import {Tag} from "../tags/tags.model";
 import {Company} from "../companies/companies.model";
 import _ from "underscore";
-
+import { Op } from 'sequelize';
+import {UserAttributes} from "../interfaces/user-attributes";
 
 @Injectable()
 export class UsersService {
@@ -55,5 +56,50 @@ export class UsersService {
 
     async getUserById(id) {
         return await this.userRepository.findOne({where: { id }});
+    }
+
+    async getAllWorkers(tagOptions, currentUserId) {
+        try {
+            const user = await this.getOneUser({id: currentUserId});
+
+            let {search, ids} = tagOptions;
+            const {companyId} = user;
+
+            if (typeof ids === 'string' ) {
+                ids = [ids];
+            }
+
+            const workers = await this.getWorkers({search, ids, companyId});
+
+            const response = {
+                success: true,
+                data: {workers}
+            };
+
+            return response;
+        } catch (err) {
+            throw err;
+        }
+    }
+
+    async getWorkers({ ids, search, companyId }) {
+        const query: any = { attributes: ['id', 'name'], where: {}, limit: 10 };
+
+        if (companyId) {
+            query.where.companyId = companyId;
+        }
+
+        if (ids?.length) {
+            query.where.id = { [Op.notIn]: ids };
+        }
+
+        if (search) {
+            query.where[Op.or] = [{ name: { [Op.iLike]: `%${search}%` } }];
+        }
+
+        query.order = [['name', 'ASC']];
+
+        const users = await this.userRepository.findAll(query);
+        return users as UserAttributes[];
     }
 }
