@@ -15,7 +15,7 @@ declare global {
 }
 
 @Injectable()
-export class PlanMiddleware implements NestMiddleware {
+export class PlanMiddlewareService implements NestMiddleware {
     constructor(@InjectModel(User) private userRepository: typeof User,
                 @InjectModel(Company) private companyRepository: typeof Company,
                 private stripeService: StripeService) {}

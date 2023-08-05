@@ -83,7 +83,10 @@ export class UsersService {
     }
 
     async getWorkers({ ids, search, companyId }) {
-        const query: any = { attributes: ['id', 'name'], where: {}, limit: 10 };
+        const query: any = {
+            attributes: ['id', 'name'],
+            where: {}, limit: 10
+        };
 
         if (companyId) {
             query.where.companyId = companyId;

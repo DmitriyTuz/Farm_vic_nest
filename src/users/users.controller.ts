@@ -4,7 +4,7 @@ import {UsersService} from "./users.service";
 import {ApiOperation, ApiResponse, ApiTags} from "@nestjs/swagger";
 import {User} from "./users.model";
 import {JwtAuthGuard} from "../auth/jwt-auth.guard";
-import {PlanMiddleware} from "../middlewares/plan-middleware/plan.middleware";
+import {PlanMiddlewareService} from "../middlewares/plan-middleware/plan.middleware.service";
 import {GetWorkersOptions} from "../interfaces/worker-options";
 
 @ApiTags('Users')

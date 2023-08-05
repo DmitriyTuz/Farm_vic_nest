@@ -16,6 +16,9 @@ import { Payment } from "./payment/payment.model";
 import { TagsModule } from './tags/tags.module';
 import { StripeModule } from './stripe/stripe.module';
 import { CompaniesModule } from './companies/companies.module';
+import { LocationsModule } from './locations/locations.module';
+import { MapLocation } from "./locations/locations.model";
+import {PlanMiddlewareModule} from "./middlewares/plan-middleware/plan.middleware. module";
 
 
 @Module({
@@ -32,7 +35,7 @@ import { CompaniesModule } from './companies/companies.module';
             username: process.env.POSTGRES_USER,
             password: process.env.POSTGRES_PASSWORD,
             database: process.env.POSTGRES_DB,
-            models: [User, Tag, Company, UserTags, Payment],
+            models: [User, Tag, Company, UserTags, Payment, MapLocation],
             // autoLoadModels: true
         }),
         UsersModule,
@@ -45,6 +48,8 @@ import { CompaniesModule } from './companies/companies.module';
         TagsModule,
         StripeModule,
         CompaniesModule,
+        LocationsModule,
+        PlanMiddlewareModule
     ]
 
 })
