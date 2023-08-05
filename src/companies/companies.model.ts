@@ -2,6 +2,7 @@ import {Column, DataType, HasMany, Model, Table} from "sequelize-typescript";
 import {ApiProperty} from "@nestjs/swagger";
 import {User} from "../users/users.model";
 import {Tag} from "../tags/tags.model";
+import {MapLocation} from "../locations/locations.model";
 
 // interface UserCreationsAttributes {
 //     name: string;
@@ -61,14 +62,8 @@ export class Company extends Model {
 
     @HasMany(() => Tag)
     tags: Tag[];
-//     Company.hasMany(models.User, {
-//     as: 'users',
-//     foreignKey: 'companyId',
-// });
-//
-//
-// Company.hasMany(models.Tag, {
-//     as: 'tags',
-//     foreignKey: 'companyId',
-// });
+
+    @HasMany(() => MapLocation)
+    locations: MapLocation[];
+
 }

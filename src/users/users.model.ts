@@ -47,9 +47,7 @@ export class User extends Model/*<User, UserCreationAttrs>*/ {
     lastActive: Date;
 
     @ForeignKey(() => Company)
-    @Column({
-        // allowNull: false,
-    })
+    @Column({ type: DataType.INTEGER })
     companyId: number;
 
     @BelongsTo(() => Company, { foreignKey: 'companyId' })
