@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import {UsersService} from "../users/users.service";
 import {InjectModel} from "@nestjs/sequelize";
-import {User} from "../users/users.model";
 import {MapLocation} from "./locations.model";
 import {LocationAttributes} from "../interfaces/location-attributes";
 

@@ -1,8 +1,8 @@
 {
   "development": {
     "username": "postgres",
-    "password": "vicinity",
-    "database": "vicinity_dev",
+    "password": "1111",
+    "database": "farm-vic-nest-db",
     "host": "localhost",
     "dialect": "postgres"
   },
