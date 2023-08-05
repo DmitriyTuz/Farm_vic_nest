@@ -19,7 +19,9 @@ import { CompaniesModule } from './companies/companies.module';
 import { LocationsModule } from './locations/locations.module';
 import { MapLocation } from "./locations/locations.model";
 import {PlanMiddlewareModule} from "./middlewares/plan-middleware/plan.middleware. module";
-
+import { TasksModule } from './tasks/tasks.module';
+import {Task} from "./tasks/tasks.model";
+import {UserTasks} from "./tasks/user-tasks.model";
 
 @Module({
     controllers: [],
@@ -35,7 +37,7 @@ import {PlanMiddlewareModule} from "./middlewares/plan-middleware/plan.middlewar
             username: process.env.POSTGRES_USER,
             password: process.env.POSTGRES_PASSWORD,
             database: process.env.POSTGRES_DB,
-            models: [User, Tag, Company, UserTags, Payment, MapLocation],
+            models: [User, Tag, Company, UserTags, Payment, MapLocation, Task, UserTasks],
             // autoLoadModels: true
         }),
         UsersModule,
@@ -49,7 +51,8 @@ import {PlanMiddlewareModule} from "./middlewares/plan-middleware/plan.middlewar
         StripeModule,
         CompaniesModule,
         LocationsModule,
-        PlanMiddlewareModule
+        PlanMiddlewareModule,
+        TasksModule
     ]
 
 })

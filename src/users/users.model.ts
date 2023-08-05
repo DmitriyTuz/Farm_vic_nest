@@ -4,6 +4,7 @@ import {Company} from "../companies/companies.model";
 import {Tag} from "../tags/tags.model";
 import {UserTags} from "../tags/user-tags.model";
 import {Payment} from "../payment/payment.model";
+import {Task} from "../tasks/tasks.model";
 
 // interface UserCreationAttrs {
 //     name: string;
@@ -58,5 +59,8 @@ export class User extends Model/*<User, UserCreationAttrs>*/ {
 
     @HasMany(() => Payment)
     payments: Payment[];
+
+    @HasMany(() => Task)
+    tasks: Task[];
 
 }
