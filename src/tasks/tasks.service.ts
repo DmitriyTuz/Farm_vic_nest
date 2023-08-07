@@ -8,6 +8,9 @@ import {MapLocation} from "../locations/locations.model";
 import {Tag} from "../tags/tags.model";
 import {HelpersService} from "../lib/helpers/helpers.service";
 import _ from "underscore";
+import {CompleteTask} from "../complete-task/complete-task.model";
+import {ReportTask} from "../report-task/report-task.model";
+// const _ = require('underscore');
 const moment = require("moment/moment");
 // import moment from "moment/moment";
 
@@ -19,6 +22,9 @@ export class TasksService {
 
     async getAll(reqBody, currentUserId, res) {
         try {
+
+            console.log('!!! currentUserId = ', currentUserId)
+
             const user = await this.userService.getOneUser({id: currentUserId});
             let userId = 0;
 
@@ -30,6 +36,8 @@ export class TasksService {
 
             const {status, date, type, location, tags} = reqBody
             const tasks = await this.getAllTasks({status, date, type, location, tags, companyId, userId});
+
+            console.log('!!! tasks = ', tasks)
 
             let returnedTasks = [];
 
@@ -44,7 +52,7 @@ export class TasksService {
                 return dateDiffA === 0 ? -1 : dateDiffB === 0 ? 1 : 0;
             });
 
-            // console.log('returnedTasks = ', returnedTasks)
+            console.log('returnedTasks = ', returnedTasks)
 
             const filterCounts = await this.getFilterCount(companyId, userId, status);
 
@@ -83,26 +91,26 @@ export class TasksService {
             attributes: this.helperService.getModelFields(Task, [], true, true, 'Task'),
             where: {},
             include: [
-                // {
-                //     attributes: this.helperService.getModelFields(ReportTask, [], true, true, 'reportInfo'),
-                //     model: ReportTask,
-                //     as: 'reportInfo',
-                //     include: [{
-                //         attributes: ['id', 'name', 'createdAt'],
-                //         model: User,
-                //         as: 'user'
-                //     }]
-                // },
-                // {
-                //     attributes: getModelFields(CompleteTask, [], true, true, 'completeInfo'),
-                //     model: CompleteTask,
-                //     as: 'completeInfo',
-                //     include: [{
-                //         attributes: ['id', 'name', 'createdAt'],
-                //         model: User,
-                //         as: 'user'
-                //     }]
-                // },
+                {
+                    attributes: this.helperService.getModelFields(ReportTask, [], true, true, 'reportInfo'),
+                    model: ReportTask,
+                    as: 'reportInfo',
+                    include: [{
+                        attributes: ['id', 'name', 'createdAt'],
+                        model: User,
+                        as: 'user'
+                    }]
+                },
+                {
+                    attributes: this.helperService.getModelFields(CompleteTask, [], true, true, 'completeInfo'),
+                    model: CompleteTask,
+                    as: 'completeInfo',
+                    include: [{
+                        attributes: ['id', 'name', 'createdAt'],
+                        model: User,
+                        as: 'user'
+                    }]
+                },
                 {
                     attributes: this.helperService.getModelFields(User, ['password'], true, true, 'creator'),
                     model: User,

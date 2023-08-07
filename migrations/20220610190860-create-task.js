@@ -25,7 +25,7 @@ module.exports = {
         type: Sequelize.STRING
       },
       executionTime: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.DECIMAL,
       },
       comment: {
         type: Sequelize.STRING
@@ -52,7 +52,7 @@ module.exports = {
       updatedAt: {
         allowNull: false,
         type: Sequelize.DATE
-      }
+      },
     });
     await queryInterface.addIndex('Tasks', ['id']);
     await queryInterface.sequelize.query('ALTER SEQUENCE "Tasks_id_seq" RESTART 10000');
