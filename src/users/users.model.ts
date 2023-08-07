@@ -6,6 +6,8 @@ import {UserTags} from "../tags/user-tags.model";
 import {Payment} from "../payment/payment.model";
 import {Task} from "../tasks/tasks.model";
 import {UserTasks} from "../tasks/user-tasks.model";
+import {CompleteTask} from "../complete-task/complete-task.model";
+import {ReportTask} from "../report-task/report-task.model";
 
 // interface UserCreationAttrs {
 //     name: string;
@@ -67,6 +69,10 @@ export class User extends Model/*<User, UserCreationAttrs>*/ {
     @BelongsToMany(() => Task, () => UserTasks)
     tasks: Task[];
 
+    @HasMany(() => CompleteTask)
+    completeInfo: CompleteTask[];
 
+    @HasMany(() => ReportTask)
+    reportInfo: ReportTask[];
 
 }

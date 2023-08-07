@@ -1,4 +1,4 @@
-import {BelongsTo, BelongsToMany, Column, DataType, ForeignKey, Model, Table} from "sequelize-typescript";
+import {BelongsTo, BelongsToMany, Column, DataType, ForeignKey, HasMany, Model, Table} from "sequelize-typescript";
 import {ApiProperty} from "@nestjs/swagger";
 import {Company} from "../companies/companies.model";
 import {TaskStatuses} from "../lib/constants";
@@ -9,6 +9,8 @@ import {Tag} from "../tags/tags.model";
 import {TaskTags} from "./task-tags.model";
 import {MapLocation} from "../locations/locations.model";
 import {TaskLocations} from "./task-locations.model";
+import {CompleteTask} from "../complete-task/complete-task.model";
+import {ReportTask} from "../report-task/report-task.model";
 
 // interface UserCreationsAttributes {
 //     name: string;
@@ -63,6 +65,9 @@ export class Task extends Model {
     @Column
     completedAt: Date;
 
+    @Column(DataType.DATEONLY)
+    dueDate: Date;
+
     @ForeignKey(() => User)
     @Column
     userId: number;
@@ -85,5 +90,11 @@ export class Task extends Model {
 
     @BelongsToMany(() => MapLocation, () => TaskLocations)
     mapLocation: MapLocation[];
+
+    @HasMany(() => CompleteTask)
+    completeInfo: CompleteTask[];
+
+    @HasMany(() => ReportTask)
+    reportInfo: ReportTask[];
 
 }

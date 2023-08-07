@@ -24,6 +24,10 @@ import {Task} from "./tasks/tasks.model";
 import {UserTasks} from "./tasks/user-tasks.model";
 import {TaskTags} from "./tasks/task-tags.model";
 import {TaskLocations} from "./tasks/task-locations.model";
+import { CompleteTaskModule } from './complete-task/complete-task.module';
+import { ReportTaskModule } from './report-task/report-task.module';
+import {CompleteTask} from "./complete-task/complete-task.model";
+import {ReportTask} from "./report-task/report-task.model";
 
 @Module({
     controllers: [],
@@ -39,7 +43,7 @@ import {TaskLocations} from "./tasks/task-locations.model";
             username: process.env.POSTGRES_USER,
             password: process.env.POSTGRES_PASSWORD,
             database: process.env.POSTGRES_DB,
-            models: [User, Tag, Company, UserTags, Payment, MapLocation, Task, UserTasks, TaskTags, TaskLocations ],
+            models: [User, Tag, Company, UserTags, Payment, MapLocation, Task, UserTasks, TaskTags, TaskLocations, CompleteTask, ReportTask],
             // autoLoadModels: true
         }),
         UsersModule,
@@ -54,7 +58,9 @@ import {TaskLocations} from "./tasks/task-locations.model";
         CompaniesModule,
         LocationsModule,
         PlanMiddlewareModule,
-        TasksModule
+        TasksModule,
+        CompleteTaskModule,
+        ReportTaskModule
     ]
 
 })

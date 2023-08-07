@@ -46,6 +46,4 @@ export class Tag extends Model {
     @BelongsToMany(() => Task, () => TaskTags)
     tasks: Task[];
 
-
-
 }
