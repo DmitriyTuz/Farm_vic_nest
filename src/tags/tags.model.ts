@@ -3,6 +3,8 @@ import {ApiProperty} from "@nestjs/swagger";
 import {Company} from "../companies/companies.model";
 import {UserTags} from "./user-tags.model";
 import {User} from "../users/users.model";
+import {TaskTags} from "../tasks/task-tags.model";
+import {Task} from "../tasks/tasks.model";
 
 // interface UserCreationsAttributes {
 //     name: string;
@@ -40,5 +42,10 @@ export class Tag extends Model {
 
     @BelongsToMany(() => User, () => UserTags)
     users: User[];
+
+    @BelongsToMany(() => Task, () => TaskTags)
+    tasks: Task[];
+
+
 
 }

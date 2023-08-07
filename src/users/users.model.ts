@@ -5,6 +5,7 @@ import {Tag} from "../tags/tags.model";
 import {UserTags} from "../tags/user-tags.model";
 import {Payment} from "../payment/payment.model";
 import {Task} from "../tasks/tasks.model";
+import {UserTasks} from "../tasks/user-tasks.model";
 
 // interface UserCreationAttrs {
 //     name: string;
@@ -61,6 +62,11 @@ export class User extends Model/*<User, UserCreationAttrs>*/ {
     payments: Payment[];
 
     @HasMany(() => Task)
+    createdTasks: Task[];
+
+    @BelongsToMany(() => Task, () => UserTasks)
     tasks: Task[];
+
+
 
 }

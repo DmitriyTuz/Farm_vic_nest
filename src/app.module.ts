@@ -22,6 +22,8 @@ import {PlanMiddlewareModule} from "./middlewares/plan-middleware/plan.middlewar
 import { TasksModule } from './tasks/tasks.module';
 import {Task} from "./tasks/tasks.model";
 import {UserTasks} from "./tasks/user-tasks.model";
+import {TaskTags} from "./tasks/task-tags.model";
+import {TaskLocations} from "./tasks/task-locations.model";
 
 @Module({
     controllers: [],
@@ -37,7 +39,7 @@ import {UserTasks} from "./tasks/user-tasks.model";
             username: process.env.POSTGRES_USER,
             password: process.env.POSTGRES_PASSWORD,
             database: process.env.POSTGRES_DB,
-            models: [User, Tag, Company, UserTags, Payment, MapLocation, Task, UserTasks],
+            models: [User, Tag, Company, UserTags, Payment, MapLocation, Task, UserTasks, TaskTags, TaskLocations ],
             // autoLoadModels: true
         }),
         UsersModule,
