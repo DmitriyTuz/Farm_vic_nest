@@ -3,6 +3,8 @@ import {ApiProperty} from "@nestjs/swagger";
 import {User} from "../users/users.model";
 import {Tag} from "../tags/tags.model";
 import {MapLocation} from "../locations/locations.model";
+import {Payment} from "../payment/payment.model";
+import {Task} from "../tasks/tasks.model";
 
 // interface UserCreationsAttributes {
 //     name: string;
@@ -65,5 +67,8 @@ export class Company extends Model {
 
     @HasMany(() => MapLocation)
     locations: MapLocation[];
+
+    @HasMany(() => Task)
+    tasks: Task[];
 
 }

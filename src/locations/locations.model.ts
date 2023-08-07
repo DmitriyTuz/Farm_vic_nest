@@ -1,6 +1,8 @@
-import {BelongsTo, Column, DataType, ForeignKey, Model, Table} from "sequelize-typescript";
+import {BelongsTo, BelongsToMany, Column, DataType, ForeignKey, Model, Table} from "sequelize-typescript";
 import {ApiProperty} from "@nestjs/swagger";
 import {Company} from "../companies/companies.model";
+import {TaskLocations} from "../tasks/task-locations.model";
+import {Task} from "../tasks/tasks.model";
 
 // interface UserCreationsAttributes {
 //     name: string;
@@ -41,5 +43,8 @@ export class MapLocation extends Model {
 
     @BelongsTo(() => Company)
     company: Company;
+
+    @BelongsToMany(() => Task, () => TaskLocations)
+    tasks: Task[];
 
 }
