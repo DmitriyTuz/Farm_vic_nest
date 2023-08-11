@@ -16,6 +16,25 @@ export class AuthService {
                 private userService: UsersService,
                 ) {}
 
+    async signUp(reqBody, req, res) {
+        // try {
+        //     req.body.ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+        //
+        //     const { logo, companyName, phone, name, password } = checkSignUpData(req.body);
+        //     const { company } = await createCompany({ logo, name: companyName });
+        //     const { user } = await createUser({ phone, name, type: UserTypes.ADMIN, password, companyId: company.id });
+        //     await company.update({ownerId: user.id});
+        //
+        //     const response = {
+        //         success: true
+        //     }
+        //
+        //     return sendResponse({ id: user.id }, response, res);
+        // } catch (err) {
+        //     throw (err);
+        // }
+    }
+
     async login(reqBody, req, res) {
         try {
             reqBody.ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
@@ -62,5 +81,15 @@ export class AuthService {
         }
     }
 
+    async logout(req, res) {
+        try {
+            delete req.headers.authorization;
+            res.clearCookie('AuthorizationToken');
+
+            return res.status(200).send({success: true});
+        } catch (err) {
+            throw (err);
+        }
+    }
 
 }
