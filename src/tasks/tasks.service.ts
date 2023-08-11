@@ -23,8 +23,6 @@ export class TasksService {
     async getAll(reqBody, currentUserId, res) {
         try {
 
-            console.log('!!! currentUserId = ', currentUserId)
-
             const user = await this.userService.getOneUser({id: currentUserId});
             let userId = 0;
 
@@ -36,8 +34,6 @@ export class TasksService {
 
             const {status, date, type, location, tags} = reqBody
             const tasks = await this.getAllTasks({status, date, type, location, tags, companyId, userId});
-
-            console.log('!!! tasks = ', tasks)
 
             let returnedTasks = [];
 
@@ -51,8 +47,6 @@ export class TasksService {
 
                 return dateDiffA === 0 ? -1 : dateDiffB === 0 ? 1 : 0;
             });
-
-            console.log('returnedTasks = ', returnedTasks)
 
             const filterCounts = await this.getFilterCount(companyId, userId, status);
 

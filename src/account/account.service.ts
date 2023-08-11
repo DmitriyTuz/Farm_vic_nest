@@ -11,7 +11,6 @@ export class AccountService {
     async getOne(currentUserId) {
         try {
 
-            console.log('currentUserId = ', currentUserId)
             const user = await this.usersService.getOneUser({id: currentUserId});
 
             if (!user) {
@@ -29,7 +28,6 @@ export class AccountService {
                 }
             };
 
-            console.log('response = ', response)
             return response;
         } catch (err) {
             console.log(err);
