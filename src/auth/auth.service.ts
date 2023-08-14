@@ -1,11 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import {LoginUserDto} from "./dto/login-user.dto";
 import {HelpersService} from "../lib/helpers/helpers.service";
 import {CheckerService} from "../lib/checker/checker.service";
 import {PasswordService} from "../lib/password/password.service";
 import {UsersService} from "../users/users.service";
+import {UserTypes} from "../lib/constants";
+import {CompaniesService} from "../companies/companies.service";
 
-import { Response } from 'express';
+import * as bcrypt from "bcryptjs";
 
 @Injectable()
 export class AuthService {
@@ -14,25 +15,32 @@ export class AuthService {
                 private checkerService: CheckerService,
                 private passwordService: PasswordService,
                 private userService: UsersService,
+                private companyService: CompaniesService,
                 ) {}
 
     async signUp(reqBody, req, res) {
-        // try {
-        //     req.body.ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-        //
-        //     const { logo, companyName, phone, name, password } = checkSignUpData(req.body);
-        //     const { company } = await createCompany({ logo, name: companyName });
-        //     const { user } = await createUser({ phone, name, type: UserTypes.ADMIN, password, companyId: company.id });
-        //     await company.update({ownerId: user.id});
-        //
-        //     const response = {
-        //         success: true
-        //     }
-        //
-        //     return sendResponse({ id: user.id }, response, res);
-        // } catch (err) {
-        //     throw (err);
-        // }
+        try {
+            req.body.ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+
+            const { logo, companyName, phone, name, password } = this.checkSignUpData(req.body);
+            const { company } = await this.companyService.createCompany({ logo, name: companyName });
+            const hashPassword = await bcrypt.hash(password, 5);
+
+            console.log('password = ', password);
+            console.log('hashPassword = ', hashPassword);
+
+            const { user } = await this.userService.createUser({ phone, name, type: UserTypes.ADMIN, password: hashPassword, companyId: company.id });
+
+            await company.update({ownerId: user.id});
+
+            const response = {
+                success: true
+            }
+
+            return this.helperService.sendResponse({ id: user.id }, response, res);
+        } catch (err) {
+            throw (err);
+        }
     }
 
     async login(reqBody, req, res) {
@@ -48,6 +56,17 @@ export class AuthService {
             return this.helperService.sendResponse({id: user.id}, response, res);
         } catch (err) {
             console.log(err)
+        }
+    }
+
+    async logout(req, res) {
+        try {
+            delete req.headers.authorization;
+            res.clearCookie('AuthorizationToken');
+
+            return res.status(200).send({success: true});
+        } catch (err) {
+            throw (err);
         }
     }
 
@@ -81,15 +100,10 @@ export class AuthService {
         }
     }
 
-    async logout(req, res) {
-        try {
-            delete req.headers.authorization;
-            res.clearCookie('AuthorizationToken');
-
-            return res.status(200).send({success: true});
-        } catch (err) {
-            throw (err);
-        }
+    private checkSignUpData(data) {
+        const requiredFields = ['companyName', 'phone', 'name', 'password'];
+        this.checkerService.checkRequiredFields(data, requiredFields, false);
+        return data;
     }
 
 }

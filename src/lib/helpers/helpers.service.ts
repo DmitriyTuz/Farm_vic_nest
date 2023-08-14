@@ -2,6 +2,8 @@ import {Injectable} from '@nestjs/common';
 import {Model, Sequelize} from "sequelize-typescript";
 const jwt = require('jsonwebtoken');
 import Credentials from "../../../credentials";
+// const _ = require('underscore');
+import _ from 'underscore';
 
 @Injectable()
 export class HelpersService {
@@ -54,4 +56,11 @@ export class HelpersService {
         res.status(200).send(responseData);
     }
 
+    getModelData(modelFields, modelData) {
+        try {
+            return _.pick(modelData, ...modelFields);
+        } catch (err) {
+            throw (err);
+        }
+    }
 }

@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import {TaskTypes, UserTypes} from "../constants";
 
 @Injectable()
 export class CheckerService {
@@ -42,4 +43,21 @@ export class CheckerService {
         }
     }
 
+    checkName(data) {
+        for (let field in data) {
+            if (['name', 'title',].includes(field) && (!data[field] || data[field].length < 2)) {
+                throw ({status: 422, message: `422-${field}-must-be-at-least-2-characters`, stack: new Error().stack});
+            }
+        }
+    }
+
+    checkType(type, modelName) {
+        if (modelName === 'User' && ![UserTypes.MANAGER, UserTypes.WORKER, UserTypes.ADMIN].includes(type)) {
+            throw ({status: 422, message: `422-user-type-is-not-correct`, stack: new Error().stack});
+        }
+
+        if (modelName === 'Task' && ![TaskTypes.LOW, TaskTypes.MEDIUM, TaskTypes.HIGH].includes(type)) {
+            throw ({status: 422, message: `422-task-type-is-not-correct`, stack: new Error().stack});
+        }
+    }
 }

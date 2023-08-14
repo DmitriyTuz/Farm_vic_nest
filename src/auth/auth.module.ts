@@ -8,6 +8,7 @@ import {JwtStrategy} from "./strategies/jwt.strategy";
 import {CheckerModule} from "../lib/checker/checker.module";
 import {HelpersModule} from "../lib/helpers/helpers.module";
 import {PasswordModule} from "../lib/password/password.module";
+import {CompaniesModule} from "../companies/companies.module";
 
 
 @Module({
@@ -24,7 +25,8 @@ import {PasswordModule} from "../lib/password/password.module";
         PassportModule,
         CheckerModule,
         HelpersModule,
-        PasswordModule
+        PasswordModule,
+        CompaniesModule
     ],
     exports: [AuthService, JwtModule],
 })

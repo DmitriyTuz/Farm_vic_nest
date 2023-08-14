@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import {User} from "./users.model";
 import {InjectModel} from "@nestjs/sequelize";
-import {CreateUserDto} from "./dto/create-user.dto";
 import {HelpersService} from "../lib/helpers/helpers.service";
 import {Tag} from "../tags/tags.model";
 import {Company} from "../companies/companies.model";
@@ -9,12 +8,18 @@ import _ from "underscore";
 import { Op } from 'sequelize';
 import {UserAttributes} from "../interfaces/user-attributes";
 import {Task} from "../tasks/tasks.model";
+import {CheckerService} from "../lib/checker/checker.service";
+import {PasswordService} from "../lib/password/password.service";
+import {TwilioService} from "../lib/twilio/twilio.service";
 
 @Injectable()
 export class UsersService {
 
     constructor(@InjectModel(User) private userRepository: typeof User,
-                private helperService: HelpersService) {}
+                private helperService: HelpersService,
+                private checkerService: CheckerService,
+                private passwordService: PasswordService,
+                private twilioService: TwilioService) {}
 
     async getAll(reqBody, currentUserId, req, res) {
         try {
@@ -93,7 +98,7 @@ export class UsersService {
 
         query.order = [['id', 'ASC']]
 
-        return User.findAll(query);
+        return this.userRepository.findAll(query);
     }
 
     async getFilterCount(companyId) {
@@ -122,9 +127,34 @@ export class UsersService {
         return filterCounts;
     }
 
-    async createUser(dto: CreateUserDto) {
-        const user = await this.userRepository.create({...dto});
-        return user;
+    async createUser(userData) {
+        try {
+            const requiredFields = ['phone', 'name', 'type', 'companyId'];
+            this.checkerService.checkRequiredFields(userData, requiredFields, false);
+            const {phone, name, type} = userData;
+
+            this.checkerService.checkUserPhone(phone);
+            this.checkerService.checkName({name});
+            this.checkerService.checkType(type, 'User');
+
+            const createdFields = ['phone', 'name', 'type', 'password', 'companyId'];
+            const newUser = this.helperService.getModelData(createdFields, userData);
+            let newPass = userData.password;
+
+            if (!userData.password) {
+                newPass = this.passwordService.createPassword();
+                newUser.password = newPass;
+            }
+
+            const user = await this.userRepository.create(newUser);
+
+            const message = await this.twilioService.sendSMS(phone, newPass);
+            // const message = await console.log('Hello !')
+
+            return { user, message }
+        } catch (err) {
+            throw(err);
+        }
     }
 
     // async getAllUsers() {
@@ -234,6 +264,7 @@ export class UsersService {
     }
 
     async updateOnboard(user) {
+        console.log('!!! user.id = ', user.id)
         await this.userRepository.update({hasOnboard: true}, {where: {id: user.id}});
     }
 

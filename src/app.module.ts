@@ -28,6 +28,8 @@ import { CompleteTaskModule } from './complete-task/complete-task.module';
 import { ReportTaskModule } from './report-task/report-task.module';
 import {CompleteTask} from "./complete-task/complete-task.model";
 import {ReportTask} from "./report-task/report-task.model";
+import { TwilioModule } from './lib/twilio/twilio.module';
+import {Plan} from "./plans/plans.model";
 
 @Module({
     controllers: [],
@@ -43,7 +45,7 @@ import {ReportTask} from "./report-task/report-task.model";
             username: process.env.POSTGRES_USER,
             password: process.env.POSTGRES_PASSWORD,
             database: process.env.POSTGRES_DB,
-            models: [User, Tag, Company, UserTags, Payment, MapLocation, Task, UserTasks, TaskTags, TaskLocations, CompleteTask, ReportTask],
+            models: [User, Tag, Company, UserTags, Payment, MapLocation, Task, UserTasks, TaskTags, TaskLocations, CompleteTask, ReportTask, Plan],
             // autoLoadModels: true
         }),
         UsersModule,
@@ -60,7 +62,8 @@ import {ReportTask} from "./report-task/report-task.model";
         PlanMiddlewareModule,
         TasksModule,
         CompleteTaskModule,
-        ReportTaskModule
+        ReportTaskModule,
+        TwilioModule
     ]
 
 })
