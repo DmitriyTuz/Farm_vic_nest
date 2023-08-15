@@ -13,6 +13,7 @@ import {StripeModule} from "../stripe/stripe.module";
 import {CheckerModule} from "../lib/checker/checker.module";
 import {PasswordModule} from "../lib/password/password.module";
 import {TwilioModule} from "../lib/twilio/twilio.module";
+import {PaymentModule} from "../payment/payment.module";
 
 @Module({
   controllers: [UsersController],

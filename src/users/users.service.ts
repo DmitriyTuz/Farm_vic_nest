@@ -11,15 +11,48 @@ import {Task} from "../tasks/tasks.model";
 import {CheckerService} from "../lib/checker/checker.service";
 import {PasswordService} from "../lib/password/password.service";
 import {TwilioService} from "../lib/twilio/twilio.service";
+import {Payment} from "../payment/payment.model";
+import {UserTypes} from "../lib/constants";
+import {PaymentService} from "../payment/payment.service";
 
 @Injectable()
 export class UsersService {
 
     constructor(@InjectModel(User) private userRepository: typeof User,
+                // @InjectModel(Payment) private paymentRepository: typeof Payment,
                 private helperService: HelpersService,
                 private checkerService: CheckerService,
                 private passwordService: PasswordService,
-                private twilioService: TwilioService) {}
+                private twilioService: TwilioService,
+                // private paymentService: PaymentService
+    ) {}
+
+    async create(currentUserId: number, req, res) {
+        try {
+            const admin = await this.getOneUser({id: currentUserId});
+            const {companyId} = admin;
+
+            const {tags} = req.body;
+            req.body.companyId = companyId;
+
+            const {user, message} = await this.createUser(req.body);
+            await this.checkerService.checkTags(user, tags);
+
+            const returnedUser = await this.getOneUser({id: user.id, companyId});
+
+            let response = {
+                success: true,
+                notice: '200-user-has-been-created-successfully',
+                data: {user: this.getUserData(returnedUser)}
+            }
+
+            response = this.checkerService.checkResponse(response, message);
+
+            return res.status(200).send(response);
+        } catch (err) {
+            throw (err);
+        }
+    }
 
     async getAll(reqBody, currentUserId, req, res) {
         try {
@@ -36,22 +69,21 @@ export class UsersService {
 
             const filterCounts = await this.getFilterCount(companyId);
 
-            const response = {
+            return res.status(200).send({
                 success: true,
                 data: {users: returnedUsers, filterCounts}
-            };
+            });
 
-            return response;
         } catch (err) {
             throw err;
         }
     }
 
     async getAllUsers(reqBody) {
-        let query: any = {
+        const query: any = {
             attributes: this.helperService.getModelFields(User, [], true, true, 'User'),
             where: {},
-            limit: 0,
+            // limit: 0,
 
         };
 
@@ -264,8 +296,83 @@ export class UsersService {
     }
 
     async updateOnboard(user) {
-        console.log('!!! user.id = ', user.id)
         await this.userRepository.update({hasOnboard: true}, {where: {id: user.id}});
     }
 
+    async update(req, res) {
+        try {
+            const {tags} = req.body;
+
+            const user = await this.getOneUser({id: req.params.id});
+
+            if (!user) {
+                throw ({status: 404, message: '404-user-not-found', stack: new Error().stack});
+            }
+
+            await this.updateUser(user, req.body);
+            await this.checkerService.checkTags(user, tags);
+
+            const returnedUser = await this.getOneUser({id: req.params.id});
+
+            return res.status(200).send({
+                success: true,
+                notice: '200-user-has-been-updated-successfully',
+                data: {user: this.getUserData(returnedUser)}
+            });
+        } catch (err) {
+            throw err;
+        }
+    }
+
+    async updateUser(user, updateData) {
+        const requiredFields = ['phone', 'newPassword'];
+        this.checkerService.checkRequiredFields(updateData, requiredFields, true);
+
+        const {newPassword, name, phone, type} = updateData;
+
+        if (newPassword) {
+            this.checkerService.checkUserPassword(newPassword);
+            updateData.password = await this.passwordService.hashPassword(newPassword);
+        }
+
+        if (name) this.checkerService.checkName({name});
+        if (phone) this.checkerService.checkUserPhone(phone);
+        if (type) this.checkerService.checkType(type, 'User');
+
+        const updatedFields = ['name', 'password', 'phone', 'type'];
+        updateData = this.helperService.getModelData(updatedFields, updateData);
+
+        return user.update(updateData);
+    }
+
+    // async remove(req, res) {
+    //     try {
+    //         const user = await this.getOneUser({id: req.params.id});
+    //
+    //         if (!user) {
+    //             throw ({status: 404, message: '404-user-not-found', stack: new Error().stack});
+    //         }
+    //
+    //         if (user.type === UserTypes.ADMIN && user.company.ownerId === user.id && user.company.isSubscribe) {
+    //             const payment = await Payment.findOne({attributes: ['id', 'userId', 'subscriberId', 'customerId'], where: {userId: user.id}});
+    //             if (payment) {
+    //                 await this.paymentService.removeSubscribe(payment);
+    //             }
+    //         }
+    //
+    //         await this.removeUser(user);
+    //
+    //         return res.status(200).send({
+    //             success: true,
+    //             notice: '200-user-has-been-removed-successfully',
+    //             userId: req.params.id
+    //         });
+    //     } catch (err) {
+    //         throw err;
+    //     }
+    // }
+    //
+    // private async removeUser(user) {
+    //     await user.destroy();
+    // }
 }

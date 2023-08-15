@@ -1,8 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import {TaskTypes, UserTypes} from "../constants";
+import {Tag} from "../../tags/tags.model";
+import {InjectModel} from "@nestjs/sequelize";
+import Credentials from '../../../credentials';
 
 @Injectable()
 export class CheckerService {
+
+    constructor(@InjectModel(Tag) private tagRepository: typeof Tag) {}
 
     checkRequiredFields(data: any, requiredFields: any[], isNull: boolean) {
         if (isNull) {
@@ -59,5 +64,51 @@ export class CheckerService {
         if (modelName === 'Task' && ![TaskTypes.LOW, TaskTypes.MEDIUM, TaskTypes.HIGH].includes(type)) {
             throw ({status: 422, message: `422-task-type-is-not-correct`, stack: new Error().stack});
         }
+    }
+
+    async checkTags(model, tags) {
+        const p = [];
+        const s = [];
+
+        for (const t of tags) {
+            s.push(await this.getOneTag({name: t.toLowerCase(), companyId: model.companyId}));
+        }
+
+        const resolve = await Promise.all(s);
+        tags = resolve.map(r => r[0]);
+
+        // tags = s.map(r => r[0]);
+
+        let userTagNames = model?.tags?.length ? model.tags.map(t => t.name) : [];
+
+        for (const t of tags) {
+            if (!userTagNames.includes(t.name)) {
+                p.push(model.addTag(t))
+            }
+
+            if (userTagNames.includes(t.name)) {
+                userTagNames.splice(userTagNames.indexOf(t.name), 1);
+            }
+        }
+
+        if (userTagNames.length) {
+            for (const tagName of userTagNames) {
+                const tag = model.tags.find(t => t.name === tagName);
+                p.push(model.removeTag(tag));
+            }
+        }
+        await Promise.all(p);
+    }
+
+    async getOneTag(findQuery) {
+        return this.tagRepository.findOrCreate({attributes: ['id', 'name'], where: findQuery});
+    }
+
+    checkResponse(response, message) {
+        if (Credentials.config.NODE_ENV !== 'production') {
+            response.smsMessage = message;
+        }
+
+        return response;
     }
 }

@@ -6,6 +6,7 @@ import {Company} from "../companies/companies.model";
 import {PlanTypes} from "../lib/constants";
 import {StripeService} from "../stripe/stripe.service";
 import {Plan} from "../plans/plans.model";
+import {User} from "../users/users.model";
 
 @Injectable()
 export class PaymentService {
@@ -13,14 +14,14 @@ export class PaymentService {
     constructor(@InjectModel(Payment) private paymentRepository: typeof Payment,
                 @InjectModel(Company) private companyRepository: typeof Company,
                 @InjectModel(Plan) private planRepository: typeof Plan,
+                // @InjectModel(User) private userRepository: typeof User,
                 private userService: UsersService,
                 private stripeService: StripeService) {}
 
 
-        async getOnePayment(userId) {
+    async getOnePayment(userId) {
         return this.paymentRepository.findOne({ where: {userId} });
     }
-
 
     async createSubscribe(req, res) {
         try {
@@ -78,4 +79,21 @@ export class PaymentService {
             await this.paymentRepository.update({subscriberId: subscriber.id, paidAt: new Date(), agree: payment.agree || agree},  {where: {id: payment.id}})
         }
     };
+
+    // async removeSubscribe(payment: Payment) {
+    //     const user = await User.findOne({attributes: ['id', 'companyId'], where: {id: payment.userId}});
+    //     const company = await this.companyRepository.findOne({attributes: ['id', 'isTrial'], where: {id: user.companyId}});
+    //
+    //     if (company.isTrial) {
+    //         await this.companyRepository.update({isTrial: false}, {where: {id: user.companyId}});
+    //     } else if (payment?.subscriberId) {
+    //         await Promise.all([
+    //             this.stripeService.cancelSubscribe(payment.subscriberId),
+    //             this.companyRepository.update({isSubscribe: false}, {where: {id: user.companyId}}),
+    //             this.paymentRepository.update({subscriberId: null}, {where: {id: payment.id}})
+    //         ]);
+    //
+    //         console.log('The Subscribe has been cancelled successfully')
+    //     }
+    // }
 }

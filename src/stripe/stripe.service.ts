@@ -22,4 +22,8 @@ export class StripeService {
 
         return stripe.subscriptions.create(stripeQuery);
     }
+
+    async cancelSubscribe(id) {
+        return stripe.subscriptions.del(id);
+    }
 }

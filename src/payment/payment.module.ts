@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import {forwardRef, Module} from '@nestjs/common';
 import { PaymentService } from './payment.service';
 import {PaymentController} from "./payment.controller";
 import {Payment} from "./payment.model";
@@ -13,8 +13,8 @@ import {StripeModule} from "../stripe/stripe.module";
   controllers: [PaymentController],
   providers: [PaymentService],
   imports: [
-      SequelizeModule.forFeature([Payment, Company, Plan]),
-      PaymentModule,
+      SequelizeModule.forFeature([Payment, Company, Plan, User]),
+      // PaymentModule,
       UsersModule,
       StripeModule
   ],
