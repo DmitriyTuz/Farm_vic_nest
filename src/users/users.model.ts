@@ -1,4 +1,13 @@
-import {BelongsTo, BelongsToMany, Column, DataType, ForeignKey, HasMany, Model, Table} from "sequelize-typescript";
+import {
+    BelongsTo,
+    BelongsToMany,
+    Column,
+    DataType,
+    ForeignKey,
+    HasMany,
+    Model,
+    Table
+} from "sequelize-typescript";
 import {ApiProperty} from "@nestjs/swagger";
 import {Company} from "../companies/companies.model";
 import {Tag} from "../tags/tags.model";
@@ -8,6 +17,7 @@ import {Task} from "../tasks/tasks.model";
 import {UserTasks} from "../tasks/user-tasks.model";
 import {CompleteTask} from "../complete-task/complete-task.model";
 import {ReportTask} from "../report-task/report-task.model";
+import {Injectable} from "@nestjs/common";
 
 // interface UserCreationAttrs {
 //     name: string;
@@ -16,6 +26,7 @@ import {ReportTask} from "../report-task/report-task.model";
 //     type: string;
 // }
 
+@Injectable()
 @Table
 export class User extends Model/*<User, UserCreationAttrs>*/ {
 
@@ -49,6 +60,9 @@ export class User extends Model/*<User, UserCreationAttrs>*/ {
 
     @Column({ type: DataType.DATE })
     lastActive: Date;
+
+    @Column({ defaultValue: false })
+    hasOnboard: boolean;
 
     @ForeignKey(() => Company)
     @Column({ type: DataType.INTEGER })

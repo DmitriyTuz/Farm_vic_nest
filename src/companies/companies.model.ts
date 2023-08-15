@@ -59,6 +59,9 @@ export class Company extends Model {
     @Column
     trialAt: Date;
 
+    @Column
+    ownerId: number;
+
     @HasMany(() => User, 'companyId')
     users: User[];
 

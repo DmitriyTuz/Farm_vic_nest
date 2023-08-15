@@ -1,5 +1,4 @@
-import {Body, Controller, Get, Post, Query, UseGuards, Param, Res, Patch, Req} from '@nestjs/common';
-import {CreateUserDto} from "./dto/create-user.dto";
+import {Body, Controller, Get, Post, Query, UseGuards, Param, Res, Patch, Req, Delete} from '@nestjs/common';
 import {UsersService} from "./users.service";
 import {ApiOperation, ApiResponse, ApiTags} from "@nestjs/swagger";
 import {User} from "./users.model";
@@ -14,10 +13,16 @@ export class UsersController {
 
     constructor(private userService: UsersService) {}
 
+    @Post()
+    @UseGuards(JwtAuthGuard, PlanMiddlewareService)
+    create(@Req() req: Request, @Res() res: Response) {
+        return this.userService.create(req.user.id, req, res);
+    }
+
     @ApiOperation({summary: 'User creation'})
     @ApiResponse({status: 200, type: User})
-    @Post()
-    create(@Body() userDto: CreateUserDto) {
+    @Post('/create-user')
+    createUser(@Body() userDto) {
         return this.userService.createUser(userDto);
     }
 
@@ -54,5 +59,17 @@ export class UsersController {
     updateOnboardUser(@Req() req: Request, @Res() res: Response) {
         return this.userService.updateOnboardUser(req.user.id, res);
     }
+
+    @UseGuards(JwtAuthGuard)
+    @Patch('/:id')
+    update(@Req() req: Request, @Res() res: Response): Promise<User> {
+        return this.userService.update(req, res);
+    }
+
+    // @UseGuards(JwtAuthGuard)
+    // @Delete('/:id')
+    // remove(@Req() req: Request, @Res() res: Response): Promise<void> {
+    //     return this.userService.remove(req, res);
+    // }
 
 }

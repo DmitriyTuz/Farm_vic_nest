@@ -10,6 +10,10 @@ import {UserTags} from "../tags/user-tags.model";
 import {AuthModule} from "../auth/auth.module";
 import {Payment} from "../payment/payment.model";
 import {StripeModule} from "../stripe/stripe.module";
+import {CheckerModule} from "../lib/checker/checker.module";
+import {PasswordModule} from "../lib/password/password.module";
+import {TwilioModule} from "../lib/twilio/twilio.module";
+import {PaymentModule} from "../payment/payment.module";
 
 @Module({
   controllers: [UsersController],
@@ -18,7 +22,10 @@ import {StripeModule} from "../stripe/stripe.module";
       SequelizeModule.forFeature([User, Tag, Company, UserTags, Payment]),
       HelpersModule,
       forwardRef(() => AuthModule),
-      StripeModule
+      StripeModule,
+      CheckerModule,
+      PasswordModule,
+      TwilioModule
   ],
   exports: [UsersService]
 })

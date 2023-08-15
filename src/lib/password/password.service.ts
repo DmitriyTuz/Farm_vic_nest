@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-// import bcrypt from "bcrypt";
 const bcrypt = require('bcrypt');
+const generator = require('generate-password');
 
 @Injectable()
 export class PasswordService {
@@ -54,5 +54,21 @@ export class PasswordService {
         }
 
         return check;
+    };
+
+    createPassword() {
+        return generator.generate({
+            length: 10,
+            numbers: true
+        });
+    }
+
+    async hashPassword(password) {
+        try {
+            let salt = await bcrypt.genSalt(10);
+            return await bcrypt.hash(password, salt);
+        } catch (err) {
+            throw (err);
+        }
     };
 }
