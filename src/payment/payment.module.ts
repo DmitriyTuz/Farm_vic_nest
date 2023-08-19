@@ -14,8 +14,7 @@ import {StripeModule} from "../stripe/stripe.module";
   providers: [PaymentService],
   imports: [
       SequelizeModule.forFeature([Payment, Company, Plan, User]),
-      // PaymentModule,
-      UsersModule,
+      forwardRef(() => UsersModule),
       StripeModule
   ],
   exports: [PaymentService]

@@ -24,7 +24,7 @@ export class UsersService {
                 private checkerService: CheckerService,
                 private passwordService: PasswordService,
                 private twilioService: TwilioService,
-                // private paymentService: PaymentService
+                private paymentService: PaymentService
     ) {}
 
     async create(currentUserId: number, req, res) {
@@ -49,6 +49,7 @@ export class UsersService {
             response = this.checkerService.checkResponse(response, message);
 
             return res.status(200).send(response);
+
         } catch (err) {
             throw (err);
         }
@@ -86,7 +87,6 @@ export class UsersService {
             // limit: 0,
 
         };
-
 
         if (reqBody.companyId) {
             if (!reqBody.ids?.includes(10000)) {
@@ -345,34 +345,35 @@ export class UsersService {
         return user.update(updateData);
     }
 
-    // async remove(req, res) {
-    //     try {
-    //         const user = await this.getOneUser({id: req.params.id});
-    //
-    //         if (!user) {
-    //             throw ({status: 404, message: '404-user-not-found', stack: new Error().stack});
-    //         }
-    //
-    //         if (user.type === UserTypes.ADMIN && user.company.ownerId === user.id && user.company.isSubscribe) {
-    //             const payment = await Payment.findOne({attributes: ['id', 'userId', 'subscriberId', 'customerId'], where: {userId: user.id}});
-    //             if (payment) {
-    //                 await this.paymentService.removeSubscribe(payment);
-    //             }
-    //         }
-    //
-    //         await this.removeUser(user);
-    //
-    //         return res.status(200).send({
-    //             success: true,
-    //             notice: '200-user-has-been-removed-successfully',
-    //             userId: req.params.id
-    //         });
-    //     } catch (err) {
-    //         throw err;
-    //     }
-    // }
-    //
-    // private async removeUser(user) {
-    //     await user.destroy();
-    // }
+    async remove(req, res) {
+        try {
+            const user = await this.getOneUser({id: req.params.id});
+
+            if (!user) {
+                throw ({status: 404, message: '404-user-not-found', stack: new Error().stack});
+            }
+
+            if (user.type === UserTypes.ADMIN && user.company.ownerId === user.id && user.company.isSubscribe) {
+                const payment = await Payment.findOne({attributes: ['id', 'userId', 'subscriberId', 'customerId'], where: {userId: user.id}});
+                if (payment) {
+                    await this.paymentService.removeSubscribe(req, res, payment);
+                }
+            }
+
+            await this.removeUser(user);
+
+            return res.status(200).send({
+                success: true,
+                notice: '200-user-has-been-removed-successfully',
+                userId: req.params.id
+            });
+        } catch (err) {
+            throw err;
+        }
+    }
+
+    private async removeUser(user) {
+        await user.destroy();
+    }
+
 }
