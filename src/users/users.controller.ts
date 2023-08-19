@@ -66,10 +66,10 @@ export class UsersController {
         return this.userService.update(req, res);
     }
 
-    // @UseGuards(JwtAuthGuard)
-    // @Delete('/:id')
-    // remove(@Req() req: Request, @Res() res: Response): Promise<void> {
-    //     return this.userService.remove(req, res);
-    // }
+    @UseGuards(JwtAuthGuard)
+    @Delete('/:id')
+    remove(@Req() req: Request, @Res() res: Response): Promise<void> {
+        return this.userService.remove(req, res);
+    }
 
 }

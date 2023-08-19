@@ -7,6 +7,8 @@ import {PlanTypes} from "../lib/constants";
 import {StripeService} from "../stripe/stripe.service";
 import {Plan} from "../plans/plans.model";
 import {User} from "../users/users.model";
+import {CheckerService} from "../lib/checker/checker.service";
+const moment = require('moment');
 
 @Injectable()
 export class PaymentService {
@@ -14,20 +16,67 @@ export class PaymentService {
     constructor(@InjectModel(Payment) private paymentRepository: typeof Payment,
                 @InjectModel(Company) private companyRepository: typeof Company,
                 @InjectModel(Plan) private planRepository: typeof Plan,
-                // @InjectModel(User) private userRepository: typeof User,
-                private userService: UsersService,
+                @InjectModel(User) private userRepository: typeof User,
+                // private userService: UsersService,
+                // private checkerService: CheckerService,
                 private stripeService: StripeService) {}
-
 
     async getOnePayment(userId) {
         return this.paymentRepository.findOne({ where: {userId} });
     }
 
-    async createSubscribe(req, res) {
-        try {
-            const {planType, agree} = req.body;
+    // async create(req, res, user: User) {
+    //     try {
+    //         req.body.expiration = `${moment(req.body.exp_month, 'M').format('MM')}/${moment(req.body.exp_year, 'YYYY').format('YY')}`;
+    //
+    //         if (user.company.isSubscribe) {
+    //             throw ({status: 422, message: '422-the-subscribe-still-active', stack: new Error().stack});
+    //         }
+    //
+    //         let payment = await this.getOnePayment(user.id);
+    //
+    //         if (payment) {
+    //             await this.deletePayment(payment.id);
+    //         }
+    //
+    //         payment = await this.createPayment(user, req.body);
+    //
+    //         return res.status(200).send({
+    //             success: true,
+    //             notice: 'The payment has been created',
+    //             data: {payment}
+    //         });
+    //     } catch (err) {
+    //         throw err;
+    //     }
+    // }
 
-            const user = await this.userService.getOneUser({id: req.user.id});
+    // private async createPayment(user: User, newPaymentInfo) {
+    //     const requiredFields = ['number', 'token', 'cardType','expiration'];
+    //     this.checkerService.checkRequiredFields(newPaymentInfo, requiredFields, false);
+    //
+    //     const {number, cardType, nameOnCard, expiration, token, agree} = newPaymentInfo;
+    //     const customer = await this.stripeService.customerCreate(token, user.email, user.name);
+    //
+    //     const newPayment = {
+    //         userId: user.id,
+    //         number: number.toString(),
+    //         cardType,
+    //         nameOnCard,
+    //         expiration,
+    //         customerId: customer.id,
+    //         type: 'Stripe',
+    //         agree: !!agree
+    //     };
+    //
+    //     return Payment.create(newPayment);
+    // }
+
+    async createSubscribe(req, res, user) {
+
+        try {
+
+            const {planType, agree} = req.body;
 
             await this.createSubscribePrivat(user, req.params.id, planType, agree);
 
@@ -35,12 +84,14 @@ export class PaymentService {
                 success: true,
                 notice: 'Subscribed'
             });
+
         } catch (err) {
             throw(err);
         }
     }
 
     private async createSubscribePrivat(user, paymentId, typePlan, agree) {
+
         const company = await this.companyRepository.findOne({attributes: ['id', 'hasTrial', 'isTrial'], where: {id: user.companyId}});
 
         if (typePlan === PlanTypes.FREE) {
@@ -80,20 +131,25 @@ export class PaymentService {
         }
     };
 
-    // async removeSubscribe(payment: Payment) {
-    //     const user = await User.findOne({attributes: ['id', 'companyId'], where: {id: payment.userId}});
-    //     const company = await this.companyRepository.findOne({attributes: ['id', 'isTrial'], where: {id: user.companyId}});
-    //
-    //     if (company.isTrial) {
-    //         await this.companyRepository.update({isTrial: false}, {where: {id: user.companyId}});
-    //     } else if (payment?.subscriberId) {
-    //         await Promise.all([
-    //             this.stripeService.cancelSubscribe(payment.subscriberId),
-    //             this.companyRepository.update({isSubscribe: false}, {where: {id: user.companyId}}),
-    //             this.paymentRepository.update({subscriberId: null}, {where: {id: payment.id}})
-    //         ]);
-    //
-    //         console.log('The Subscribe has been cancelled successfully')
-    //     }
-    // }
+    async removeSubscribe(req, res, payment: Payment) {
+        const user = await this.userRepository.findOne({attributes: ['id', 'companyId'], where: {id: payment.userId}});
+        const company = await this.companyRepository.findOne({attributes: ['id', 'isTrial'], where: {id: user.companyId}});
+
+        if (company.isTrial) {
+            await this.companyRepository.update({isTrial: false}, {where: {id: user.companyId}});
+        } else if (payment?.subscriberId) {
+            await Promise.all([
+                this.stripeService.cancelSubscribe(payment.subscriberId),
+                this.companyRepository.update({isSubscribe: false}, {where: {id: user.companyId}}),
+                this.paymentRepository.update({subscriberId: null}, {where: {id: payment.id}})
+            ]);
+
+            console.log('The Subscribe has been cancelled successfully')
+        }
+        return res.status(200).send({
+            success: true,
+            notice: 'Subscribed'
+        });
+    }
+
 }
