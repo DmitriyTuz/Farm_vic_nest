@@ -13,14 +13,6 @@ export class PaymentController {
     constructor(private paymentService: PaymentService,
                 private userService: UsersService) {}
 
-    // @UseGuards(JwtAuthGuard)
-    // @Post('/api/payment')
-    // async create(@Req() req: Request, @Res() res: Response) {
-    //
-    //     const user = await this.userService.getOneUser({id: req.user.id});
-    //     return this.paymentService.create(req, res, user);
-    // }
-
     @UseGuards(JwtAuthGuard)
     @Post('/api/payment/:id/create-subscribe')
     async createSubscribe(@Req() req: Request, @Res() res: Response) {
@@ -51,6 +43,14 @@ export class PaymentController {
             }
         // }
 
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Post('/api/payment')
+    async create(@Req() req: Request, @Res() res: Response) {
+
+        const user = await this.userService.getOneUser({id: req.user.id});
+        return this.paymentService.create(req, res, user);
     }
 
 }
