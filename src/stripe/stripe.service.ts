@@ -26,4 +26,8 @@ export class StripeService {
     async cancelSubscribe(id) {
         return stripe.subscriptions.del(id);
     }
+
+    async customerCreate(token, phone, name) {
+        return stripe.customers.create({source: token, phone: phone, name: name});
+    }
 }

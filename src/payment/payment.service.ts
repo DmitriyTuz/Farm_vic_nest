@@ -18,59 +18,70 @@ export class PaymentService {
                 @InjectModel(Plan) private planRepository: typeof Plan,
                 @InjectModel(User) private userRepository: typeof User,
                 // private userService: UsersService,
-                // private checkerService: CheckerService,
+                private checkerService: CheckerService,
                 private stripeService: StripeService) {}
 
     async getOnePayment(userId) {
         return this.paymentRepository.findOne({ where: {userId} });
     }
 
-    // async create(req, res, user: User) {
-    //     try {
-    //         req.body.expiration = `${moment(req.body.exp_month, 'M').format('MM')}/${moment(req.body.exp_year, 'YYYY').format('YY')}`;
-    //
-    //         if (user.company.isSubscribe) {
-    //             throw ({status: 422, message: '422-the-subscribe-still-active', stack: new Error().stack});
-    //         }
-    //
-    //         let payment = await this.getOnePayment(user.id);
-    //
-    //         if (payment) {
-    //             await this.deletePayment(payment.id);
-    //         }
-    //
-    //         payment = await this.createPayment(user, req.body);
-    //
-    //         return res.status(200).send({
-    //             success: true,
-    //             notice: 'The payment has been created',
-    //             data: {payment}
-    //         });
-    //     } catch (err) {
-    //         throw err;
-    //     }
-    // }
+    async create(req, res, user: User) {
+        try {
+            req.body.expiration = `${moment(req.body.exp_month, 'M').format('MM')}/${moment(req.body.exp_year, 'YYYY').format('YY')}`;
 
-    // private async createPayment(user: User, newPaymentInfo) {
-    //     const requiredFields = ['number', 'token', 'cardType','expiration'];
-    //     this.checkerService.checkRequiredFields(newPaymentInfo, requiredFields, false);
-    //
-    //     const {number, cardType, nameOnCard, expiration, token, agree} = newPaymentInfo;
-    //     const customer = await this.stripeService.customerCreate(token, user.email, user.name);
-    //
-    //     const newPayment = {
-    //         userId: user.id,
-    //         number: number.toString(),
-    //         cardType,
-    //         nameOnCard,
-    //         expiration,
-    //         customerId: customer.id,
-    //         type: 'Stripe',
-    //         agree: !!agree
-    //     };
-    //
-    //     return Payment.create(newPayment);
-    // }
+            if (user.company.isSubscribe) {
+                throw ({status: 422, message: '422-the-subscribe-still-active', stack: new Error().stack});
+            }
+
+            let payment = await this.getOnePayment(user.id);
+
+            if (payment) {
+                await this.deletePayment(req, res, payment.id);
+            }
+
+            payment = await this.createPayment(user, req.body);
+
+            return res.status(200).send({
+                success: true,
+                notice: 'The payment has been created',
+                data: {payment}
+            });
+        } catch (err) {
+            throw err;
+        }
+    }
+
+    private async createPayment(user: User, newPaymentInfo) {
+        const requiredFields = ['number', 'token', 'cardType','expiration'];
+        this.checkerService.checkRequiredFields(newPaymentInfo, requiredFields, false);
+
+        const {number, cardType, nameOnCard, expiration, token, agree} = newPaymentInfo;
+        const customer = await this.stripeService.customerCreate(token, user.phone, user.name);
+
+        const newPayment = {
+            userId: user.id,
+            number: number.toString(),
+            cardType,
+            nameOnCard,
+            expiration,
+            customerId: customer.id,
+            type: 'Stripe',
+            agree: !!agree
+        };
+
+        return this.paymentRepository.create(newPayment);
+    }
+
+    private async deletePayment(req, res, paymentId: number) {
+        const payment = await this.paymentRepository.findOne({attributes: ['id', 'subscriberId', 'userId'], where: {id: paymentId}});
+
+        if (!payment) {
+            throw ({status: 404, message: '404-payment-not-found', stack: new Error().stack});
+        }
+
+        await this.removeSubscribe(req, res, payment);
+        await this.paymentRepository.destroy({where: {id: paymentId}});
+    }
 
     async createSubscribe(req, res, user) {
 
@@ -146,10 +157,12 @@ export class PaymentService {
 
             console.log('The Subscribe has been cancelled successfully')
         }
-        return res.status(200).send({
+
+        const response = {
             success: true,
             notice: 'Subscribed'
-        });
+        }
+        return response;
     }
 
 }
