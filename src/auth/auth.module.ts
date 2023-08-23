@@ -15,8 +15,8 @@ import {CompaniesModule} from "../companies/companies.module";
     controllers: [AuthController],
     providers: [AuthService, JwtStrategy],
     imports: [
-        // forwardRef(() => UsersModule),
-        UsersModule,
+        forwardRef(() => UsersModule),
+        // UsersModule,
         JwtModule.register({
             secret: process.env.JWT_SECRET || "SECRET",
             signOptions: {

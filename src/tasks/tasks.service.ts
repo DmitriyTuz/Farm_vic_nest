@@ -10,6 +10,10 @@ import {HelpersService} from "../lib/helpers/helpers.service";
 import _ from "underscore";
 import {CompleteTask} from "../complete-task/complete-task.model";
 import {ReportTask} from "../report-task/report-task.model";
+import {CheckerService} from "../lib/checker/checker.service";
+import {InjectModel} from "@nestjs/sequelize";
+import {TagsService} from "../tags/tags.service";
+import {LocationsService} from "../locations/locations.service";
 // const _ = require('underscore');
 const moment = require("moment/moment");
 // import moment from "moment/moment";
@@ -17,8 +21,12 @@ const moment = require("moment/moment");
 @Injectable()
 export class TasksService {
 
-    constructor(private userService: UsersService,
-                private helperService: HelpersService) {}
+    constructor(@InjectModel(Task) private taskRepository: typeof Task,
+                private userService: UsersService,
+                private helperService: HelpersService,
+                private checkerService: CheckerService,
+                private tagService: TagsService,
+                private locationService: LocationsService) {}
 
     async getAll(reqBody, currentUserId, res) {
         try {
@@ -220,5 +228,102 @@ export class TasksService {
 
         filterCounts.all = filterCounts.low + filterCounts.medium + filterCounts.high;
         return filterCounts;
+    }
+
+    async create(req, res) {
+        try {
+            const user = await this.userService.getOneUser({id: req.user.id});
+            const {companyId} = user;
+
+            const {tags, workers, mapLocation} = req.body;
+            req.body.companyId = companyId;
+
+            const task = await this.createTask(req.user.id, req.body);
+
+            await this.tagService.checkTags(task, tags);
+            await this.userService.checkUsers(task, workers);
+            await this.locationService.checkLocations(task, mapLocation);
+
+            const findQuery: any = {id: task.id};
+            if (companyId) {
+                findQuery.companyId = companyId;
+            }
+            const returnedTask = await this.getOneTask(findQuery);
+
+            return res.status(200).send({
+                success: true,
+                notice: '200-task-has-been-created-successfully',
+                data: {task: this.getTaskData(returnedTask)}
+            })
+
+        } catch (err) {
+            throw err;
+        }
+    }
+
+    private async getOneTask(findQuery: any) {
+        return this.taskRepository.findOne({
+            attributes: this.helperService.getModelFields(Task, [], true, true, 'Task'),
+            where: findQuery,
+            include: [
+                {
+                    attributes: this.helperService.getModelFields(ReportTask, [], true, true, 'reportInfo'),
+                    model: ReportTask,
+                    as: 'reportInfo',
+                    include: [{
+                        attributes: ['id', 'name', 'createdAt'],
+                        model: User,
+                        as: 'user'
+                    }],
+                },
+                {
+                    attributes: this.helperService.getModelFields(CompleteTask, [], true, true, 'completeInfo'),
+                    model: CompleteTask,
+                    as: 'completeInfo',
+                    include: [{
+                        attributes: ['id', 'name', 'createdAt'],
+                        model: User,
+                        as: 'user'
+                    }],
+                },
+                {
+                    attributes: this.helperService.getModelFields(User, ['password', 'updatedAt'], true, true, 'creator'),
+                    model: User,
+                    as: 'creator',
+                },
+                {
+                    attributes: ['id', 'name'],
+                    model: Tag,
+                    as: 'tags',
+                    through: {attributes: []}
+                },
+                {
+                    attributes: ['id', 'name', 'type'],
+                    model: User,
+                    as: 'workers',
+                    through: {attributes: []}
+                },
+                {
+                    model: MapLocation,
+                    as: 'mapLocation',
+                    through: {attributes: []}
+                },
+            ]
+        });
+    }
+
+    private async createTask(userId, taskData) {
+        const requiredFields = ['title', 'type', 'companyId', 'dueDate'];
+        this.checkerService.checkRequiredFields(taskData, requiredFields, false);
+        const {title, type} = taskData;
+
+        this.checkerService.checkName({title});
+        this.checkerService.checkType(type, 'Task');
+
+        const createdFields = ['title', 'type', 'executionTime', 'comment', 'mediaInfo', 'documentsInfo', 'companyId', 'dueDate'];
+        const newTask = this.helperService.getModelData(createdFields, taskData);
+        newTask.userId = userId;
+
+        return Task.create(newTask);
     }
 }

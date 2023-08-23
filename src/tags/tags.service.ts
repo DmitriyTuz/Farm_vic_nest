@@ -3,18 +3,15 @@ import {TagOptions} from "../interfaces/tag-options.interface";
 import {Tag} from "./tags.model";
 import {InjectModel} from "@nestjs/sequelize";
 import {Op} from 'sequelize';
-import {UsersService} from "../users/users.service";
 import _ from "underscore";
 
 @Injectable()
 export class TagsService {
 
-    constructor(@InjectModel(Tag) private tagRepository: typeof Tag,
-                private userService: UsersService) {}
+    constructor(@InjectModel(Tag) private tagRepository: typeof Tag) {}
 
-    async getAll(tagOptions, currentUserId, res) {
+    async getAll(tagOptions, user, res) {
         try {
-        const user = await this.userService.getOneUser({id: currentUserId});
 
         let {names, search} = tagOptions;
         const {companyId} = user;
@@ -81,6 +78,44 @@ export class TagsService {
         }
 
         return this.tagRepository.findAll(query);
+    }
+
+    async checkTags(model, tags) {
+        const p = [];
+        const s = [];
+
+        for (const t of tags) {
+            s.push(await this.getOneTag({name: t.toLowerCase(), companyId: model.companyId}));
+        }
+
+        const resolve = await Promise.all(s);
+        tags = resolve.map(r => r[0]);
+
+        // tags = s.map(r => r[0]);
+
+        let userTagNames = model?.tags?.length ? model.tags.map(t => t.name) : [];
+
+        for (const t of tags) {
+            if (!userTagNames.includes(t.name)) {
+                p.push(model.addTag(t))
+            }
+
+            if (userTagNames.includes(t.name)) {
+                userTagNames.splice(userTagNames.indexOf(t.name), 1);
+            }
+        }
+
+        if (userTagNames.length) {
+            for (const tagName of userTagNames) {
+                const tag = model.tags.find(t => t.name === tagName);
+                p.push(model.removeTag(tag));
+            }
+        }
+        await Promise.all(p);
+    }
+
+    async getOneTag(findQuery) {
+        return this.tagRepository.findOrCreate({attributes: ['id', 'name'], where: findQuery});
     }
 
 }

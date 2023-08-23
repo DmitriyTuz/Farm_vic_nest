@@ -14,6 +14,7 @@ import {TwilioService} from "../lib/twilio/twilio.service";
 import {Payment} from "../payment/payment.model";
 import {UserTypes} from "../lib/constants";
 import {PaymentService} from "../payment/payment.service";
+import {TagsService} from "../tags/tags.service";
 
 @Injectable()
 export class UsersService {
@@ -24,7 +25,8 @@ export class UsersService {
                 private checkerService: CheckerService,
                 private passwordService: PasswordService,
                 private twilioService: TwilioService,
-                private paymentService: PaymentService
+                private paymentService: PaymentService,
+                private tagService: TagsService
     ) {}
 
     async create(currentUserId: number, req, res) {
@@ -36,7 +38,7 @@ export class UsersService {
             req.body.companyId = companyId;
 
             const {user, message} = await this.createUser(req.body);
-            await this.checkerService.checkTags(user, tags);
+            await this.tagService.checkTags(user, tags);
 
             const returnedUser = await this.getOneUser({id: user.id, companyId});
 
@@ -196,7 +198,7 @@ export class UsersService {
     // }
 
     async getOneUser(findQuery): Promise<User> {
-        return await User.findOne({
+        return await this.userRepository.findOne({
             attributes: this.helperService.getModelFields(User, [], true, true, 'User'),
             where: findQuery, include: [{
                 attributes: ['id', 'name'],
@@ -310,7 +312,7 @@ export class UsersService {
             }
 
             await this.updateUser(user, req.body);
-            await this.checkerService.checkTags(user, tags);
+            await this.tagService.checkTags(user, tags);
 
             const returnedUser = await this.getOneUser({id: req.params.id});
 
@@ -374,6 +376,36 @@ export class UsersService {
 
     private async removeUser(user) {
         await user.destroy();
+    }
+
+    async checkUsers(task, users) {
+        const p = [];
+
+        const newUsers = users?.length ? await this.getAllUsers({ ids: users, companyId: task.companyId }) : [];
+
+        if (newUsers.length !== users.length) {
+            throw ({status: 422, message: `422-assigned-user-not-found`, stack: new Error().stack});
+        }
+
+        let taskUsersIds = task?.workers?.length ? task.workers.map(u => u.id) : [];
+
+        for (const u of newUsers) {
+            if (!taskUsersIds.includes(u.id)) {
+                await task.addWorker(u)
+            }
+            if (taskUsersIds.includes(u.id)) {
+                taskUsersIds.splice(taskUsersIds.indexOf(u.id), 1);
+            }
+        }
+
+        if (taskUsersIds.length) {
+            for (const userId of taskUsersIds) {
+                const user = task.workers.find(u => u.id === userId);
+                await task.removeWorker(user);
+            }
+        }
+
+        await Promise.all(p);
     }
 
 }

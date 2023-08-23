@@ -16,7 +16,8 @@ export class TagsController {
     @Get('/api/tags')
     @UseGuards(JwtAuthGuard, PlanMiddlewareService)
     async getAll(@Query() tagOptions: TagOptions, @Request() req, @Res() res: Response) {
-        return this.tagService.getAll(tagOptions, req.user.id, res);
+        const user = await this.userService.getOneUser({id: req.user.id});
+        return this.tagService.getAll(tagOptions, user, res);
     }
 
     @Get('/api/worker-tags')
