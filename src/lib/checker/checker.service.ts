@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import {TaskTypes, UserTypes} from "../constants";
+import {TaskTypes, UserTypes, TaskStatuses} from "../constants";
 import {Tag} from "../../tags/tags.model";
 import {InjectModel} from "@nestjs/sequelize";
 import Credentials from '../../../credentials';
@@ -76,4 +76,12 @@ export class CheckerService {
         return response;
     }
 
+    checkTaskStatus(status, action) {
+        if (action === 'start' && status !== TaskStatuses.WAITING) {
+            throw ({status: 422, message: `422-task-already-started`, stack: new Error().stack});
+        }
+        if (['report', 'complete'].includes(action) && status !== TaskStatuses.ACTIVE) {
+            throw ({status: 422, message: `422-task-${status === TaskStatuses.WAITING ? "didn't-start-yet" : 'already'}${status !== TaskStatuses.WAITING ? '-' + status.toLowerCase() : ''}`, stack: new Error().stack});
+        }
+    }
 }
