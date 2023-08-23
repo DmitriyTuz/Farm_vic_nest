@@ -14,7 +14,7 @@ import {CheckerModule} from "../lib/checker/checker.module";
 import {PasswordModule} from "../lib/password/password.module";
 import {TwilioModule} from "../lib/twilio/twilio.module";
 import {PaymentModule} from "../payment/payment.module";
-import {Task} from "../tasks/tasks.model";
+import {TagsModule} from "../tags/tags.module";
 
 @Module({
   controllers: [UsersController],
@@ -22,12 +22,14 @@ import {Task} from "../tasks/tasks.model";
   imports: [
       SequelizeModule.forFeature([User, Tag, Company]),
       HelpersModule,
-      // forwardRef(() => AuthModule),
+      forwardRef(() => AuthModule),
       StripeModule,
       CheckerModule,
       PasswordModule,
       TwilioModule,
-      forwardRef(() => PaymentModule)
+      forwardRef(() => PaymentModule),
+      forwardRef(() => CheckerModule),
+      forwardRef(() => TagsModule)
   ],
   exports: [UsersService]
 })

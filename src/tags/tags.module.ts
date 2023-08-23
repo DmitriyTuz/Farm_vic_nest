@@ -1,4 +1,4 @@
-import {Module} from '@nestjs/common';
+import {forwardRef, Module} from '@nestjs/common';
 import { TagsService } from './tags.service';
 import {TagsController} from "./tags.controller";
 import {SequelizeModule} from "@nestjs/sequelize";
@@ -17,9 +17,9 @@ import {StripeModule} from "../stripe/stripe.module";
     imports: [
         SequelizeModule.forFeature([Tag, User, UserTags, Company]),
         AuthModule,
-        UsersModule,
         CompaniesModule,
-        StripeModule
+        StripeModule,
+        forwardRef(() => UsersModule)
     ],
     exports: [TagsService]
 })
