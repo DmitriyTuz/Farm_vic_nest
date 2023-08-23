@@ -14,7 +14,6 @@ import {CheckerService} from "../lib/checker/checker.service";
 import {InjectModel} from "@nestjs/sequelize";
 import {TagsService} from "../tags/tags.service";
 import {LocationsService} from "../locations/locations.service";
-// const _ = require('underscore');
 const moment = require("moment/moment");
 // import moment from "moment/moment";
 
@@ -325,5 +324,138 @@ export class TasksService {
         newTask.userId = userId;
 
         return Task.create(newTask);
+    }
+
+    async update(req, res) {
+        try {
+            const user = await this.userService.getOneUser({id: req.user.id});
+            const {companyId} = user;
+
+            const {tags, workers, mapLocation} = req.body;
+
+            if (!parseInt(req?.params?.id)) {
+                throw ({status: 404, message: '404-task-id-not-found', stack: new Error().stack});
+            }
+
+            const findQuery: any = {id: req.params.id};
+            if (companyId) {
+                findQuery.companyId = companyId;
+            }
+
+            const task = await this.getOneTask(findQuery);
+
+            if (!task) {
+                throw ({status: 404, message: '404-task-not-found', stack: new Error().stack});
+            }
+
+            await this.updateTask(task, req.body);
+            await this.tagService.checkTags(task, tags);
+            await this.userService.checkUsers(task, workers);
+            await this.locationService.checkLocations(task, mapLocation);
+
+            const returnedTask = await this.getOneTask(findQuery);
+
+            return res.status(200).send({
+                success: true,
+                notice: '200-task-has-been-updated-successfully',
+                data: {task: this.getTaskData(returnedTask)}
+            });
+
+        } catch (err) {
+            throw err;
+        }
+    }
+
+    private async updateTask(task, updateData) {
+        const requiredFields = ['title', 'type', 'dueDate'];
+        this.checkerService.checkRequiredFields(updateData, requiredFields, true);
+
+        const {title, type} = updateData;
+
+        if (title) this.checkerService.checkName({title});
+        if (type) this.checkerService.checkType(type, 'Task');
+
+        if ([TaskStatuses.WAITING, TaskStatuses.COMPLETED].includes(task.status)) {
+            updateData.status = TaskStatuses.ACTIVE;
+        }
+
+        const updatedFields = ['title', 'type', 'executionTime', 'comment', 'mediaInfo', 'documentsInfo', 'status', 'dueDate'];
+        updateData = this.helperService.getModelData(updatedFields, updateData);
+
+        return task.update(updateData);
+    }
+
+    async complete(req, res) {
+        try {
+            if (!parseInt(req?.params?.id)) {
+                throw ({status: 404, message: '404-task-id-not-found', stack: new Error().stack});
+            }
+
+            const task = await this.getOneTask({id: req.params.id});
+
+            if (!task) {
+                throw ({status: 404, message: '404-task-not-found', stack: new Error().stack});
+            }
+
+            const completeInfo = await this.completeTask(req.user.id, task, req.body);
+
+            return res.status(200).send({
+                success: true,
+                notice: '200-task-has-been-completed-successfully',
+            });
+
+        } catch (err) {
+            throw err;
+        }
+    }
+
+    private async completeTask(userId, task, completeData) {
+        this.checkerService.checkTaskStatus(task.status, 'complete');
+        const requiredFields = ['timeLog'];
+        this.checkerService.checkRequiredFields(completeData, requiredFields, true);
+
+        const {timeLog, comment, mediaInfo, documentsInfo} = completeData;
+
+        const completeInfo = await CompleteTask.create({userId, taskId: task.id, timeLog, comment, mediaInfo, documentsInfo});
+        await Task.update({completedAt: new Date(), status: TaskStatuses.COMPLETED}, {where: {id: task.id}});
+        return completeInfo;
+    }
+
+    async report(req, res) {
+        try {
+
+            if (!parseInt(req?.params?.id)) {
+                throw ({status: 404, message: '404-task-id-not-found', stack: new Error().stack});
+            }
+
+            const task = await this.getOneTask({id: req.params.id});
+
+            if (!task) {
+                throw ({status: 404, message: '404-task-not-found', stack: new Error().stack});
+            }
+
+            const reportInfo = await this.reportTask(req.user.id, task, req.body);
+
+            return res.status(200).send({
+                success: true,
+                notice: '200-task-has-been-reported-successfully',
+            });
+
+        } catch (err) {
+            throw err;
+        }
+    }
+
+    private async reportTask(userId, task, reportData) {
+        this.checkerService.checkTaskStatus(task.status, 'report');
+        const requiredFields = [];
+        this.checkerService.checkRequiredFields(reportData, requiredFields, true);
+
+        const {comment, mediaInfo, documentsInfo} = reportData;
+
+        const reportInfo = await ReportTask.create({userId, taskId: task.id, comment, mediaInfo, documentsInfo});
+        await Task.update({status: TaskStatuses.WAITING}, {where: {id: task.id}});
+
+        return reportInfo;
     }
 }
