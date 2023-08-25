@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import {InjectModel} from "@nestjs/sequelize";
 import {Payment} from "./payment.model";
-import {UsersService} from "../users/users.service";
 import {Company} from "../companies/companies.model";
 import {PlanTypes} from "../lib/constants";
 import {StripeService} from "../stripe/stripe.service";
@@ -17,7 +16,6 @@ export class PaymentService {
                 @InjectModel(Company) private companyRepository: typeof Company,
                 @InjectModel(Plan) private planRepository: typeof Plan,
                 @InjectModel(User) private userRepository: typeof User,
-                // private userService: UsersService,
                 private checkerService: CheckerService,
                 private stripeService: StripeService) {}
 
