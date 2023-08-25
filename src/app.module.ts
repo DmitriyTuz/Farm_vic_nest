@@ -30,6 +30,8 @@ import {CompleteTask} from "./complete-task/complete-task.model";
 import {ReportTask} from "./report-task/report-task.model";
 import { TwilioModule } from './lib/twilio/twilio.module';
 import {Plan} from "./plans/plans.model";
+import {AwsConfigModule} from "./aws.config/aws.config.module";
+import {S3Module} from "./s3/s3.module";
 
 @Module({
     controllers: [],
@@ -63,7 +65,10 @@ import {Plan} from "./plans/plans.model";
         TasksModule,
         CompleteTaskModule,
         ReportTaskModule,
-        TwilioModule
+        TwilioModule,
+        AwsConfigModule,
+        S3Module
+
     ]
 
 })
