@@ -22,7 +22,6 @@ import {TagsModule} from "../tags/tags.module";
       HelpersModule,
       forwardRef(() => AuthModule),
       StripeModule,
-      CheckerModule,
       PasswordModule,
       TwilioModule,
       forwardRef(() => PaymentModule),
