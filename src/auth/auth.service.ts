@@ -6,7 +6,10 @@ import {UsersService} from "../users/users.service";
 import {UserTypes} from "../lib/constants";
 import {CompaniesService} from "../companies/companies.service";
 
+const jwt = require('jsonwebtoken');
+
 import * as bcrypt from "bcryptjs";
+import Credentials from "../../credentials";
 
 @Injectable()
 export class AuthService {
@@ -43,17 +46,21 @@ export class AuthService {
         }
     }
 
-    async login(reqBody, req, res) {
+    async login(reqBody: any, req, res): Promise<any> {
         try {
             reqBody.ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-
             const user = await this.webSiteAuthorization(reqBody);
 
-            const response = {
-                success: true
-            }
+            const responseData = {
+                success: true,
+            };
 
-            return this.helperService.sendResponse({id: user.id}, response, res);
+            if (user?.id) {
+                const token = jwt.sign({id: user.id}, process.env.JWT_SECRET);
+                res.cookie('AuthorizationToken', token, { maxAge: Credentials.config.JWT_EXPIRED_TIME, httpOnly: true });
+            }
+            return res.json(responseData)
+
         } catch (err) {
             console.log(err)
         }

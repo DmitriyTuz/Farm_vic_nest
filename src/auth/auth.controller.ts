@@ -14,7 +14,7 @@ export class AuthController {
     }
 
     @Post('/api/login')
-    login(@Body() reqBody: any, @Req() req: Request, @Res() res: Response) {
+    async login(@Body() reqBody: any, @Req() req: Request, @Res() res: Response): Promise<any> {
         return this.authService.login(reqBody, req, res);
     }
 

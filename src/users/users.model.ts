@@ -27,7 +27,7 @@ import {Injectable} from "@nestjs/common";
 // }
 
 @Injectable()
-@Table
+@Table({tableName: 'Users'})
 export class User extends Model/*<User, UserCreationAttrs>*/ {
 
     @ApiProperty({example: '1', description: 'User unique identificator'})

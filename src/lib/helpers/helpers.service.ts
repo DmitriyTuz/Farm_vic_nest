@@ -48,7 +48,6 @@ export class HelpersService {
 
     sendResponse(user, responseData, res) {
         if (user?.id) {
-            console.log('Credentials.config.JWT_SECRET = ', Credentials.config.JWT_SECRET)
             const token = jwt.sign({id: user.id}, Credentials.config.JWT_SECRET);
             res.cookie('AuthorizationToken', token, { maxAge: Credentials.config.JWT_EXPIRED_TIME, httpOnly: true });
         }
